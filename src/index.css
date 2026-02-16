@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --color-dark-blue: #00205B;
+  --color-brand-blue: #0057B7;
+  --color-brand-red: #E52459;
+  --color-text: #091832;
+  --color-gray: #EBEBEB;
+  --color-light-gray: #F5F5F5;
+  --color-stroke: rgba(0, 32, 91, 0.15);
+
+  --font-family-lato: "Lato", sans-serif;
+
+  --shadow-card: 0 4px 44px rgba(0, 0, 0, 0.12);
+}
+
+body {
+  font-family: var(--font-family-lato);
+  color: var(--color-text);
+  margin: 0;
+}

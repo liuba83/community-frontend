@@ -1,0 +1,54 @@
+{
+  "header": {
+    "allServices": "All Services",
+    "addService": "Add service"
+  },
+  "hero": {
+    "headline": "300+ trusted Ukrainian professionals across Texas — verified, local, human.",
+    "subtext": "Discover reliable services offered by the Ukrainian community across Texas — from hairstylists to handymen.",
+    "searchPlaceholder": "Search for services..."
+  },
+  "services": {
+    "highlighted": "Highlighted Specialists",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "noResults": "No services found. Try a different search term.",
+    "emptyCategory": "No services in this category yet. Be the first to add yours!",
+    "loading": "Loading services...",
+    "error": "Failed to load services. Please try again.",
+    "retry": "Retry"
+  },
+  "categories": {
+    "Beauty & Wellness": "Beauty & Wellness",
+    "Health & Medical": "Health & Medical",
+    "Home Services": "Home Services",
+    "Construction & Repairs": "Construction & Repairs",
+    "Garden & Outdoor": "Garden & Outdoor",
+    "Auto & Transportation": "Auto & Transportation",
+    "Food & Baking": "Food & Baking",
+    "Family & Education": "Family & Education",
+    "Legal & Documents": "Legal & Documents",
+    "Real Estate & Finance": "Real Estate & Finance",
+    "Business & Admin Support": "Business & Admin Support",
+    "Career & Coaching": "Career & Coaching",
+    "IT & Tech Services": "IT & Tech Services",
+    "Creative & Digital": "Creative & Digital",
+    "Marketing & Growth": "Marketing & Growth",
+    "Crafts, Sewing & Handmade": "Crafts, Sewing & Handmade",
+    "Events & Entertainment": "Events & Entertainment",
+    "Pet Services": "Pet Services",
+    "Security & Safety": "Security & Safety",
+    "Personal & Errand Services": "Personal & Errand Services",
+    "Other Services": "Other Services"
+  },
+  "quickTags": {
+    "Lawyer": "Lawyer",
+    "Cleaning": "Cleaning",
+    "Health & Medical": "Health & Medical",
+    "Handyman": "Handyman"
+  },
+  "footer": {
+    "copyright": "Ukrainians in Texas",
+    "contact": "Contact us"
+  }
+}
