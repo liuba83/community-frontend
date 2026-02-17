@@ -1,6 +1,6 @@
 import { SearchBar } from './SearchBar';
 import { Tag } from '../UI/Tag';
-import { quickTags } from '../../data/categories';
+import { quickTags, quickTagIcons } from '../../data/categories';
 import { useLanguage } from '../../hooks/useLanguage';
 
 export function Hero({ searchQuery, onSearchChange, activeTag, onTagClick }) {
@@ -20,10 +20,11 @@ export function Hero({ searchQuery, onSearchChange, activeTag, onTagClick }) {
           <SearchBar value={searchQuery} onChange={onSearchChange} />
         </div>
 
-        <div className="flex flex-wrap justify-center gap-2">
+        <div className="flex flex-wrap justify-center gap-4">
           {quickTags.map((tag) => (
             <Tag
               key={tag}
+              icon={quickTagIcons[tag]}
               active={activeTag === tag}
               onClick={() => onTagClick(activeTag === tag ? null : tag)}
             >

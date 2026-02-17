@@ -5,15 +5,17 @@ export function SearchBar({ value, onChange }) {
   const { t } = useLanguage();
 
   return (
-    <div className="relative w-full max-w-2xl">
-      <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-dark-blue/40" />
+    <div className="relative w-full max-w-2xl flex">
       <input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={t('hero.searchPlaceholder')}
-        className="w-full pl-12 pr-4 py-3 rounded-xl border border-stroke bg-white text-text placeholder:text-dark-blue/40 focus:outline-none focus:border-brand-blue focus:ring-1 focus:ring-brand-blue transition-colors"
+        className="w-full pl-8 pr-4 py-4 rounded-l-full border border-brand-red border-r-0 bg-white text-text text-lg placeholder:text-dark-blue/40 focus:outline-none transition-colors"
       />
+      <button className="flex items-center justify-center w-[70px] bg-brand-red rounded-r-full border border-brand-red shrink-0 cursor-pointer">
+        <SearchIcon className="w-6 h-6 text-white" />
+      </button>
     </div>
   );
 }

@@ -228,6 +228,13 @@ export const categories = [
 
 export const quickTags = ['Lawyer', 'Cleaning', 'Health & Medical', 'Handyman'];
 
+export const quickTagIcons = {
+  'Lawyer': '⚖️',
+  'Cleaning': '🧹',
+  'Health & Medical': '🏥',
+  'Handyman': '🔧',
+};
+
 export function findParentCategory(subcategory) {
   for (const cat of categories) {
     if (cat.subcategories.includes(subcategory)) {
