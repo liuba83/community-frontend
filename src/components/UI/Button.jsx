@@ -1,7 +1,7 @@
 export function Button({ children, variant = 'primary', href, className = '', ...props }) {
-  const base = 'inline-flex items-center justify-center font-bold rounded-lg transition-colors cursor-pointer';
+  const base = 'inline-flex items-center justify-center font-bold rounded-[25px] transition-colors cursor-pointer text-lg';
   const variants = {
-    primary: 'bg-brand-red text-white px-6 py-3 hover:bg-red-700',
+    primary: 'bg-brand-red text-white px-[25px] py-[15px] hover:bg-red-700',
     outline: 'border border-stroke text-dark-blue px-4 py-2 hover:bg-light-gray',
   };
 
