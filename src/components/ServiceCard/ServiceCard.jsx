@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { ImageGallery } from './ImageGallery';
 import { SocialLinks } from './SocialLinks';
-import { MapPinIcon, PhoneIcon, EmailIcon, GlobeIcon } from '../UI/Icon';
+import { MapPinIcon, PhoneIcon, EmailIcon, GlobeIcon, ChevronDownIcon } from '../UI/Icon';
 import { getSafeHref, getDomain } from '../../utils/validation';
+import { parseImageUrls } from '../../utils/imageUrl';
 import { useLanguage } from '../../hooks/useLanguage';
 
 const DESCRIPTION_LIMIT = 150;
@@ -15,79 +16,104 @@ export function ServiceCard({ service }) {
   const isLong = description.length > DESCRIPTION_LIMIT;
   const displayDescription = expanded ? description : description.slice(0, DESCRIPTION_LIMIT);
 
+  const tags = service.category
+    ? service.category.split(',').map((tag) => tag.trim()).filter(Boolean)
+    : [];
+
+  const hasImages = parseImageUrls(service.images).length > 0;
+
   return (
-    <div className="bg-white rounded-2xl shadow-card p-5 flex flex-col">
+    <div className="bg-white rounded-[30px] shadow-card p-5 flex flex-col gap-5">
       <ImageGallery images={service.images} />
 
-      <div className="flex items-start gap-3 mb-3">
-        <div className="w-10 h-10 rounded-full bg-light-gray flex items-center justify-center shrink-0 text-lg">
-          {service.title?.[0]?.toUpperCase() || '?'}
-        </div>
-        <div>
-          <h3 className="font-bold text-dark-blue text-base leading-tight">{service.title}</h3>
-          {service.category && (
-            <span className="inline-block mt-1 px-2 py-0.5 bg-light-gray text-xs rounded-full text-text/70">
-              {service.category}
-            </span>
+      {/* Name + optional avatar + tags */}
+      <div className="flex items-start gap-3.75">
+        {!hasImages && (
+          <div className="w-14.75 h-14.75 rounded-full bg-light-gray flex items-center justify-center shrink-0 text-xl font-bold text-dark-blue/50">
+            {service.title?.[0]?.toUpperCase() || '?'}
+          </div>
+        )}
+        <div className="flex-1 min-w-0">
+          <h3 className="font-bold text-dark-blue text-xl leading-tight mb-2.5">
+            {service.title}
+          </h3>
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.25">
+              {tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-flex items-center px-3 py-0.5 border border-stroke rounded-full text-base text-text"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
           )}
         </div>
       </div>
 
-      {service.address && (
-        <div className="flex items-start gap-2 text-sm text-text/70 mb-2">
-          <MapPinIcon className="w-4 h-4 shrink-0 mt-0.5" />
-          <span>{service.address}</span>
-        </div>
-      )}
+      {/* Contact info */}
+      <div className="flex flex-col gap-3">
+        {service.address && (
+          <div className="flex items-center gap-1.25">
+            <MapPinIcon className="w-4 h-4 shrink-0 text-dark-blue" />
+            <span className="text-base text-dark-blue">{service.address}</span>
+          </div>
+        )}
+        {service.phone && (
+          <div className="flex items-center gap-1.25">
+            <PhoneIcon className="w-4 h-4 shrink-0 text-dark-blue" />
+            <a href={`tel:${service.phone}`} className="text-base text-brand-blue underline">
+              {service.phone}
+            </a>
+          </div>
+        )}
+        {service.email && (
+          <div className="flex items-center gap-1.25">
+            <EmailIcon className="w-4 h-4 shrink-0 text-dark-blue" />
+            <a href={`mailto:${service.email}`} className="text-base text-brand-blue underline">
+              {service.email}
+            </a>
+          </div>
+        )}
+        {service.website && (
+          <div className="flex items-center gap-1.25">
+            <GlobeIcon className="w-4 h-4 shrink-0 text-dark-blue" />
+            <a
+              href={getSafeHref(service.website)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-base text-brand-blue underline"
+            >
+              {getDomain(service.website)}
+            </a>
+          </div>
+        )}
+      </div>
 
-      {service.phone && (
-        <div className="flex items-center gap-2 text-sm mb-1">
-          <PhoneIcon className="w-4 h-4 shrink-0 text-text/70" />
-          <a href={`tel:${service.phone}`} className="text-brand-blue hover:underline">
-            {service.phone}
-          </a>
-        </div>
-      )}
-
-      {service.email && (
-        <div className="flex items-center gap-2 text-sm mb-1">
-          <EmailIcon className="w-4 h-4 shrink-0 text-text/70" />
-          <a href={`mailto:${service.email}`} className="text-brand-blue hover:underline">
-            {service.email}
-          </a>
-        </div>
-      )}
-
-      {service.website && (
-        <div className="flex items-center gap-2 text-sm mb-1">
-          <GlobeIcon className="w-4 h-4 shrink-0 text-text/70" />
-          <a
-            href={getSafeHref(service.website)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-brand-blue hover:underline"
-          >
-            {getDomain(service.website)}
-          </a>
-        </div>
-      )}
-
-      {description && (
-        <p className="text-sm text-text/70 mt-3 leading-relaxed">
-          {displayDescription}
-          {isLong && !expanded && '... '}
+      {/* Description + show more/less + social links */}
+      <div>
+        {description && (
+          <p className="text-base text-text leading-6">
+            {displayDescription}
+            {isLong && !expanded && '…'}
+          </p>
+        )}
+        <div className={`flex items-center ${isLong ? 'justify-between' : 'justify-end'}`}>
           {isLong && (
             <button
               onClick={() => setExpanded(!expanded)}
-              className="text-brand-blue font-bold text-sm hover:underline cursor-pointer"
+              className="flex items-center gap-1 text-brand-blue text-base cursor-pointer hover:opacity-80"
             >
               {expanded ? t('services.showLess') : t('services.showMore')}
+              <ChevronDownIcon
+                className={`w-6 h-6 transition-transform ${expanded ? 'rotate-180' : ''}`}
+              />
             </button>
           )}
-        </p>
-      )}
-
-      <SocialLinks service={service} />
+          <SocialLinks service={service} />
+        </div>
+      </div>
     </div>
   );
 }

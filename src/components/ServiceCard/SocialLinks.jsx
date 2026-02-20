@@ -14,7 +14,7 @@ export function SocialLinks({ service }) {
   if (links.length === 0) return null;
 
   return (
-    <div className="flex items-center gap-3 mt-3">
+    <div className="flex items-center gap-2.5">
       {links.map((item) => (
         <a
           key={item.key}
@@ -24,7 +24,7 @@ export function SocialLinks({ service }) {
           className="text-dark-blue/40 hover:text-brand-blue transition-colors"
           aria-label={item.label}
         >
-          <item.Icon className="w-5 h-5" />
+          <item.Icon className="w-6 h-6" />
         </a>
       ))}
     </div>
