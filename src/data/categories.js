@@ -226,12 +226,12 @@ export const categories = [
   },
 ];
 
-export const quickTags = ['Lawyer', 'Cleaning', 'Health & Medical', 'Handyman'];
+export const quickTags = ['Lawyer', 'Cleaning', 'Doctors / Clinics', 'Handyman'];
 
 export const quickTagIcons = {
   'Lawyer': '⚖️',
   'Cleaning': '🧹',
-  'Health & Medical': '🏥',
+  'Doctors / Clinics': '🏥',
   'Handyman': '🔧',
 };
 

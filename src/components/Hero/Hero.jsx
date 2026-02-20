@@ -3,7 +3,7 @@ import { Tag } from '../UI/Tag';
 import { quickTags, quickTagIcons } from '../../data/categories';
 import { useLanguage } from '../../hooks/useLanguage';
 
-export function Hero({ searchQuery, onSearchChange, activeTag, onTagClick }) {
+export function Hero({ searchQuery, onSearchChange, selectedCategory, onCategorySelect }) {
   const { t } = useLanguage();
 
   return (
@@ -25,8 +25,8 @@ export function Hero({ searchQuery, onSearchChange, activeTag, onTagClick }) {
             <Tag
               key={tag}
               icon={quickTagIcons[tag]}
-              active={activeTag === tag}
-              onClick={() => onTagClick(activeTag === tag ? null : tag)}
+              active={selectedCategory === tag}
+              onClick={() => onCategorySelect(selectedCategory === tag ? null : tag)}
             >
               {t(`quickTags.${tag}`)}
             </Tag>

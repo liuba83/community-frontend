@@ -4,11 +4,9 @@ import { Hero } from '../components/Hero/Hero';
 import { ServiceList } from '../components/ServiceList/ServiceList';
 import { useServices } from '../hooks/useServices';
 import { useLanguage } from '../hooks/useLanguage';
-import { findParentCategory } from '../data/categories';
 
 export function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTag, setActiveTag] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const { services, loading, error, refetch } = useServices();
   const { t } = useLanguage();
@@ -21,18 +19,6 @@ export function HomePage() {
       result = result.filter(
         (s) => s.category === selectedCategory
       );
-    }
-
-    // Filter by quick tag (parent category level)
-    if (activeTag) {
-      result = result.filter((s) => {
-        const parent = findParentCategory(s.category);
-        return (
-          s.category === activeTag ||
-          parent === activeTag ||
-          s.category?.toLowerCase().includes(activeTag.toLowerCase())
-        );
-      });
     }
 
     // Filter by search query
@@ -51,9 +37,9 @@ export function HomePage() {
     }
 
     return result;
-  }, [services, searchQuery, activeTag, selectedCategory]);
+  }, [services, searchQuery, selectedCategory]);
 
-  const isFiltering = searchQuery || activeTag || selectedCategory;
+  const isFiltering = searchQuery || selectedCategory;
 
   // Highlighted: show first 6 when no filters are active
   const highlightedServices = useMemo(() => {
@@ -62,13 +48,7 @@ export function HomePage() {
 
   function handleCategorySelect(subcategory) {
     setSelectedCategory(subcategory);
-    setActiveTag(null);
     setSearchQuery('');
-  }
-
-  function handleTagClick(tag) {
-    setActiveTag(tag);
-    setSelectedCategory(null);
   }
 
   function handleSearchChange(value) {
@@ -80,7 +60,6 @@ export function HomePage() {
 
   function clearFilters() {
     setSearchQuery('');
-    setActiveTag(null);
     setSelectedCategory(null);
   }
 
@@ -91,8 +70,8 @@ export function HomePage() {
       <Hero
         searchQuery={searchQuery}
         onSearchChange={handleSearchChange}
-        activeTag={activeTag}
-        onTagClick={handleTagClick}
+        selectedCategory={selectedCategory}
+        onCategorySelect={handleCategorySelect}
       />
 
       {isFiltering && (
