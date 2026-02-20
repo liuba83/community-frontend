@@ -43,7 +43,9 @@ export function HomePage() {
           s.title?.toLowerCase().includes(query) ||
           s.description?.toLowerCase().includes(query) ||
           s.category?.toLowerCase().includes(query) ||
-          s.hashtags?.toLowerCase().includes(query) ||
+          (Array.isArray(s.hashtags)
+            ? s.hashtags.some((tag) => tag?.toLowerCase().includes(query))
+            : s.hashtags?.toLowerCase().includes(query)) ||
           s.address?.toLowerCase().includes(query)
       );
     }
