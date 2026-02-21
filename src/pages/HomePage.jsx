@@ -14,10 +14,10 @@ export function HomePage() {
   const filteredServices = useMemo(() => {
     let result = services;
 
-    // Filter by selected category (from mega menu - subcategory level)
+    // Filter by selected subcategory
     if (selectedCategory) {
-      result = result.filter(
-        (s) => s.category === selectedCategory
+      result = result.filter((s) =>
+        s.category?.split(',').map((c) => c.trim()).includes(selectedCategory)
       );
     }
 
@@ -98,6 +98,7 @@ export function HomePage() {
           loading={loading}
           error={error}
           onRetry={refetch}
+          onSubcategoryClick={handleCategorySelect}
         />
       ) : (
         <ServiceList
@@ -106,6 +107,7 @@ export function HomePage() {
           error={error}
           onRetry={refetch}
           title={t('services.highlighted')}
+          onSubcategoryClick={handleCategorySelect}
         />
       )}
 

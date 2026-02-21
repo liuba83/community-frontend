@@ -2,7 +2,7 @@ import { ServiceCard } from "../ServiceCard/ServiceCard";
 import { Button } from "../UI/Button";
 import { useLanguage } from "../../hooks/useLanguage";
 
-export function ServiceList({ services, loading, error, onRetry, title }) {
+export function ServiceList({ services, loading, error, onRetry, title, onSubcategoryClick }) {
     const { t } = useLanguage();
     const googleFormUrl = import.meta.env.VITE_GOOGLE_FORM_URL || "#";
 
@@ -71,7 +71,7 @@ export function ServiceList({ services, loading, error, onRetry, title }) {
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {services.map((service) => (
-                        <ServiceCard key={service.id} service={service} />
+                        <ServiceCard key={service.id} service={service} onSubcategoryClick={onSubcategoryClick} />
                     ))}
                 </div>
             </div>

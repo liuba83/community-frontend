@@ -8,7 +8,7 @@ import { useLanguage } from '../../hooks/useLanguage';
 
 const DESCRIPTION_LIMIT = 150;
 
-export function ServiceCard({ service }) {
+export function ServiceCard({ service, onSubcategoryClick }) {
   const [expanded, setExpanded] = useState(false);
   const { t } = useLanguage();
 
@@ -16,8 +16,8 @@ export function ServiceCard({ service }) {
   const isLong = description.length > DESCRIPTION_LIMIT;
   const displayDescription = expanded ? description : description.slice(0, DESCRIPTION_LIMIT);
 
-  const tags = service.category
-    ? service.category.split(',').map((tag) => tag.trim()).filter(Boolean)
+  const subcategories = service.category
+    ? service.category.split(',').map((s) => s.trim()).filter(Boolean)
     : [];
 
   const hasImages = parseImageUrls(service.images).length > 0;
@@ -37,15 +37,16 @@ export function ServiceCard({ service }) {
           <h3 className="font-bold text-dark-blue text-xl leading-tight mb-2.5">
             {service.title}
           </h3>
-          {tags.length > 0 && (
+          {subcategories.length > 0 && (
             <div className="flex flex-wrap gap-1.25">
-              {tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center px-3 py-0.5 border border-stroke rounded-full text-base text-text"
+              {subcategories.map((sub) => (
+                <button
+                  key={sub}
+                  onClick={() => onSubcategoryClick?.(sub)}
+                  className="inline-flex items-center px-3 py-0.5 border border-stroke rounded-full text-base text-text cursor-pointer hover:border-dark-blue hover:text-dark-blue transition-colors"
                 >
-                  {tag}
-                </span>
+                  {sub}
+                </button>
               ))}
             </div>
           )}
