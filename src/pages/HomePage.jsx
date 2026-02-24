@@ -38,10 +38,8 @@ export function HomePage() {
 
   const isFiltering = searchQuery || selectedCategory;
 
-  // Highlighted: show first 6 when no filters are active
-  const highlightedServices = useMemo(() => {
-    return services.slice(0, 6);
-  }, [services]);
+  const highlightedServices = useMemo(() => services.slice(0, 6), [services]);
+  const restServices = useMemo(() => services.slice(6), [services]);
 
   function handleCategorySelect(subcategory) {
     setSelectedCategory(subcategory);
@@ -98,14 +96,22 @@ export function HomePage() {
           onSubcategoryClick={handleCategorySelect}
         />
       ) : (
-        <ServiceList
-          services={highlightedServices}
-          loading={loading}
-          error={error}
-          onRetry={refetch}
-          title={t('services.highlighted')}
-          onSubcategoryClick={handleCategorySelect}
-        />
+        <>
+          <ServiceList
+            services={highlightedServices}
+            loading={loading}
+            error={error}
+            onRetry={refetch}
+            title={t('services.highlighted')}
+            onSubcategoryClick={handleCategorySelect}
+          />
+          {!loading && !error && restServices.length > 0 && (
+            <ServiceList
+              services={restServices}
+              onSubcategoryClick={handleCategorySelect}
+            />
+          )}
+        </>
       )}
 
       <footer className="border-t border-stroke py-8 px-4 text-center text-sm text-text/50">
