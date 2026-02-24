@@ -64,7 +64,7 @@ Not documented. Typical footer includes:
 
 ```html
 <title>Ukrainians in Texas — Find Ukrainian Professionals</title>
-<meta name="description" content="Directory of 300+ trusted Ukrainian professionals across Texas. Find lawyers, cleaners, handymen, and more.">
+<meta name="description" content="Directory of 100+ trusted Ukrainian professionals across Texas. Find lawyers, cleaners, handymen, and more.">
 ```
 
 ### Open Graph (Social Sharing)

@@ -56,7 +56,7 @@ A service directory platform connecting Ukrainian professionals in Texas with pe
 
 **Hero Section:**
 
-- Headline: "300+ trusted Ukrainian professionals across Texas — verified, local, human."
+- Headline: "100+ trusted Ukrainian professionals across Texas — verified, local, human."
 - Subtext: "Discover reliable services offered by the Ukrainian community across Texas — from hairstylists to handymen."
 - Search bar with placeholder "Search for services..."
 - Quick filter tags: Lawyer, Cleaning, Health/Medical, Handyman (popular categories)
