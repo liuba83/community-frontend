@@ -49,7 +49,7 @@ export function CategoryMenu({ onSelectCategory }) {
                         onClick={() => handleSelect(sub)}
                         className="text-sm text-text hover:text-brand-blue transition-colors text-left w-full cursor-pointer"
                       >
-                        {sub}
+                        {t(`subcategories.${sub}`)}
                       </button>
                     </li>
                   ))}
@@ -103,7 +103,7 @@ export function MobileCategoryMenu({ onSelectCategory, onClose }) {
                   onClick={() => handleSelect(sub)}
                   className="block text-sm text-text hover:text-brand-blue transition-colors cursor-pointer"
                 >
-                  {sub}
+                  {t(`subcategories.${sub}`)}
                 </button>
               ))}
             </div>

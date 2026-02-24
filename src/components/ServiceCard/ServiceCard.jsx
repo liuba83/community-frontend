@@ -45,7 +45,7 @@ export function ServiceCard({ service, onSubcategoryClick }) {
                   onClick={() => onSubcategoryClick?.(sub)}
                   className="inline-flex items-center px-3 py-0.5 border border-stroke rounded-full text-base text-text cursor-pointer hover:border-dark-blue hover:text-dark-blue transition-colors"
                 >
-                  {sub}
+                  {t(`subcategories.${sub}`)}
                 </button>
               ))}
             </div>
