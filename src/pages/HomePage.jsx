@@ -108,6 +108,7 @@ export function HomePage() {
           {!loading && !error && restServices.length > 0 && (
             <ServiceList
               services={restServices}
+              title={t('services.allSpecialists')}
               onSubcategoryClick={handleCategorySelect}
             />
           )}

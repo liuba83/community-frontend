@@ -10,6 +10,7 @@
   },
   "services": {
     "highlighted": "Highlighted Specialists",
+    "allSpecialists": "More Specialists",
     "showMore": "Show more",
     "showLess": "Show less",
     "noResults": "No services found. Try a different search term.",
