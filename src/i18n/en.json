@@ -11,6 +11,7 @@
   "services": {
     "highlighted": "Featured",
     "allSpecialists": "Explore more professionals",
+    "clearFilters": "Clear filters",
     "showMore": "Show more",
     "showLess": "Show less",
     "noResults": "No services found. Try a different search term.",

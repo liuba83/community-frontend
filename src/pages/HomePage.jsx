@@ -82,14 +82,14 @@ export function HomePage() {
           <div className="flex items-center gap-2 text-sm text-text/70">
             {selectedCategory && (
               <span className="bg-dark-blue text-white px-3 py-1 rounded-full text-xs font-bold">
-                {selectedCategory}
+                {t(`subcategories.${selectedCategory}`)}
               </span>
             )}
             <button
               onClick={clearFilters}
               className="text-brand-blue hover:underline cursor-pointer"
             >
-              Clear filters
+              {t('services.clearFilters')}
             </button>
           </div>
         </div>
