@@ -38,8 +38,16 @@ export function HomePage() {
 
   const isFiltering = searchQuery || selectedCategory;
 
-  const highlightedServices = useMemo(() => services.slice(0, 6), [services]);
-  const restServices = useMemo(() => services.slice(6), [services]);
+  const highlightedServices = useMemo(() => {
+    const featured = services.filter((s) => s.featured);
+    const recentNonFeatured = services.filter((s) => !s.featured);
+    return [...featured, ...recentNonFeatured].slice(0, 6);
+  }, [services]);
+
+  const restServices = useMemo(() => {
+    const highlightedIds = new Set(highlightedServices.map((s) => s.id));
+    return services.filter((s) => !highlightedIds.has(s.id));
+  }, [services, highlightedServices]);
 
   function handleCategorySelect(subcategory) {
     setSelectedCategory(subcategory);
