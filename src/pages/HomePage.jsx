@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { Header } from '../components/Header/Header';
 import { Hero } from '../components/Hero/Hero';
 import { ServiceList } from '../components/ServiceList/ServiceList';
+import { Footer } from '../components/Footer/Footer';
 import { useServices } from '../hooks/useServices';
 import { useLanguage } from '../hooks/useLanguage';
 
@@ -123,15 +124,7 @@ export function HomePage() {
         </>
       )}
 
-      <footer className="border-t border-stroke py-8 px-4 text-center text-sm text-text/50">
-        <p>&copy; {new Date().getFullYear()} {t('footer.copyright')}</p>
-        <a
-          href="mailto:admin@example.com"
-          className="text-brand-blue hover:underline"
-        >
-          {t('footer.contact')}
-        </a>
-      </footer>
+      <Footer />
     </div>
   );
 }
