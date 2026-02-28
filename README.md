@@ -7,7 +7,7 @@ A service directory platform connecting Ukrainian professionals in Texas with pe
 This platform helps users browse, search, and filter Ukrainian service providers across Texas. Providers can submit their listings via a public Google Form, which are then reviewed and approved by admins before appearing on the site.
 
 **Key Features:**
-- 🔍 Browse and search 300+ Ukrainian professionals
+- 🔍 Browse and search Ukrainian professionals
 - 🏷️ Filter by 22 service categories
 - 🌐 Bilingual UI (English/Ukrainian)
 - 📱 Mobile-responsive design

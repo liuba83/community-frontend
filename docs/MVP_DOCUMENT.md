@@ -56,7 +56,7 @@ A service directory platform connecting Ukrainian professionals in Texas with pe
 
 **Hero Section:**
 
-- Headline: "300+ trusted Ukrainian professionals across Texas — verified, local, human."
+- Headline: "100+ trusted Ukrainian professionals across Texas — verified, local, human."
 - Subtext: "Discover reliable services offered by the Ukrainian community across Texas — from hairstylists to handymen."
 - Search bar with placeholder "Search for services..."
 - Quick filter tags: Lawyer, Cleaning, Health/Medical, Handyman (popular categories)
@@ -263,7 +263,6 @@ When opened:
 | Business/Service Name | Short answer | Yes |
 | Description | Paragraph (max 1000 chars) | Yes |
 | Category | Dropdown (subcategories only) | Yes |
-| Hashtags/Tags | Checkboxes or short answer | No |
 | Address | Short answer | No |
 | Phone | Short answer | Yes |
 | Email | Short answer (email validation) | Yes |
@@ -375,11 +374,10 @@ For each new submission:
 **Table: Services**
 
 | Field | Type | Notes |
-|-------|------|-------|
+| ------- | ------ |------- |
 | title | Single line text | Business name |
 | description | Long text | Full description |
 | category | Single select | Subcategory only (e.g., "Cleaning") |
-| hashtags | Multiple select | Additional tags |
 | address | Single line text | Full address |
 | phone | Phone number | Primary contact |
 | email | Email | Primary email |
@@ -395,7 +393,7 @@ For each new submission:
 **Categories Table (Optional — for dynamic categories):**
 
 | Field | Type |
-|-------|------|
+| ------- | ------ |
 | name | Single line text |
 | icon | Single line text (emoji) |
 | parentCategory | Single line text |
@@ -526,6 +524,7 @@ ukrainians-in-texas/            # Root directory (monorepo)
 ### Environment Files
 
 **`.env.example`** (safe to commit):
+
 ```env
 # Client-side (public - will be in browser bundle)
 VITE_GOOGLE_FORM_URL=https://forms.gle/your_form_id
@@ -537,6 +536,7 @@ AIRTABLE_TABLE_NAME=Services
 ```
 
 **`.env`** (NEVER commit - add to `.gitignore`):
+
 ```env
 # Your actual secrets
 VITE_GOOGLE_FORM_URL=https://forms.gle/abc123
@@ -546,6 +546,7 @@ AIRTABLE_TABLE_NAME=Services
 ```
 
 **`.gitignore`**:
+
 ```gitignore
 # Environment variables
 .env
@@ -769,11 +770,13 @@ Thumbs.db
 ### Environment Variables (Secrets Management)
 
 **Client-Side (VITE_ prefix - visible in browser):**
+
 ```env
 VITE_GOOGLE_FORM_URL=https://forms.gle/your_form_id
 ```
 
 **Server-Side (no prefix - secure):**
+
 ```env
 AIRTABLE_API_KEY=keyXXXXXXXXXXXX
 AIRTABLE_BASE_ID=appXXXXXXXXXXXX
@@ -785,6 +788,7 @@ AIRTABLE_TABLE_NAME=Services
 ### Deployment Flow
 
 **Development:**
+
 ```bash
 npm install              # Install dependencies
 npm run dev             # Vite dev server (http://localhost:5173)
@@ -793,6 +797,7 @@ vercel dev              # Test with serverless functions locally
 ```
 
 **Production:**
+
 ```bash
 git push origin main    # Push to GitHub
                         # Vercel auto-detects and deploys:
@@ -804,6 +809,7 @@ git push origin main    # Push to GitHub
 ### Real-Time Updates
 
 **When admin approves a listing:**
+
 1. Admin clicks `approved = ✓` in Airtable
 2. Data saved immediately
 3. Website updates on next page load/refresh
@@ -828,7 +834,7 @@ git push origin main    # Push to GitHub
 ### Flow 2: Search & Filter
 
 1. User types in search bar
-2. Results filter in real-time (name, description, category, hashtags)
+2. Results filter in real-time (name, description, category)
 3. OR user clicks category from dropdown
 4. Results show only matching services
 
@@ -900,7 +906,7 @@ AIRTABLE_TABLE_NAME=Services
 - Homepage with hero, search, highlighted specialists
 - Category dropdown (desktop mega menu, mobile accordion)
 - Service cards (with/without images)
-- Search across name, description, category, hashtags
+- Search across name, description, category
 - Category filtering
 - "Add service" button → links to Google Form (external)
 - Airtable integration via Vercel API proxy (read approved listings)
