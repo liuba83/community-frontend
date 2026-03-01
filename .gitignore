@@ -10,6 +10,9 @@ node_modules/
 dist/
 .vercel/
 
+# Claude Code
+.claude/worktrees/
+
 # IDE
 .vscode/
 .idea/

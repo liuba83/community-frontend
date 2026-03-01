@@ -29,7 +29,7 @@ Assumptions, conflicts, and open questions tracked during MVP implementation.
 
 1. **Google Form URL** — Actual form URL not yet created. Using placeholder.
 2. **Domain name** — TBD. Using placeholder in meta tags.
-3. **Contact email** — TBD. Using `admin@example.com` placeholder.
+3. **Contact email** — `info@spilno.us`
 4. **Airtable credentials** — Not yet provided. API proxy will work once env vars are set.
 
 ---

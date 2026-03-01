@@ -118,7 +118,7 @@ This is a community project. Contributions are welcome!
 
 ## Contact
 
-For questions or support, contact: [admin@example.com](mailto:admin@example.com)
+For questions or support, contact: [info@spilno.us](mailto:info@spilno.us)
 
 ---
 

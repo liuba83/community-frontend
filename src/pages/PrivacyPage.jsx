@@ -60,7 +60,7 @@ const content = {
 export function PrivacyPage() {
   const { language } = useLanguage();
   const c = content[language] || content.en;
-  const contactEmail = import.meta.env.VITE_CONTACT_EMAIL || 'admin@example.com';
+  const contactEmail = import.meta.env.VITE_CONTACT_EMAIL || 'info@spilno.us';
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
