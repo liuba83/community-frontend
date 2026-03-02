@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-dark-blue: #00205B;
   --color-brand-blue: #0057B7;
@@ -12,6 +14,15 @@
   --font-family-lato: "Lato", sans-serif;
 
   --shadow-card: 0 4px 44px rgba(0, 0, 0, 0.12);
+}
+
+html.dark {
+  --color-dark-blue: #7BA8E8;
+  --color-text: #E2E8F0;
+  --color-gray: #1E3A5F;
+  --color-light-gray: #0A1628;
+  --color-stroke: rgba(255, 255, 255, 0.12);
+  --shadow-card: 0 4px 44px rgba(0, 0, 0, 0.4);
 }
 
 body {
