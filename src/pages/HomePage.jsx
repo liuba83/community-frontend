@@ -87,7 +87,7 @@ export function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-[#0A1628]">
       <Header onSelectCategory={handleCategorySelect} />
 
       <Hero

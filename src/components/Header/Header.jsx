@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Logo } from "./Logo";
 import { CategoryMenu } from "./CategoryMenu";
 import { LanguageSelector } from "./LanguageSelector";
+import { ThemeToggle } from "./ThemeToggle";
 import { MobileMenu } from "./MobileMenu";
 import { Button } from "../UI/Button";
 import { MenuIcon } from "../UI/Icon";
@@ -15,7 +16,7 @@ export function Header({ onSelectCategory }) {
     return (
         <>
             <header className="sticky top-0 z-40 py-3 md:py-4 px-4 md:px-8 bg-light-gray">
-                <div className="max-w-[1440px] mx-auto bg-white border border-[#ededed] rounded-[60px] px-5 md:px-[30px] py-3 md:py-[20px] flex items-center justify-between">
+                <div className="max-w-[1440px] mx-auto bg-white dark:bg-[#0F2040] border border-[#ededed] dark:border-white/10 rounded-[60px] px-5 md:px-[30px] py-3 md:py-[20px] flex items-center justify-between">
                     <div className="flex items-center gap-5">
                         <Logo />
                         <CategoryMenu onSelectCategory={onSelectCategory} />
@@ -24,6 +25,9 @@ export function Header({ onSelectCategory }) {
                     <div className="flex items-center gap-5">
                         <div className="hidden md:block">
                             <LanguageSelector />
+                        </div>
+                        <div className="hidden md:block">
+                            <ThemeToggle />
                         </div>
                         <div className="hidden md:block">
                             <Button href={googleFormUrl}>

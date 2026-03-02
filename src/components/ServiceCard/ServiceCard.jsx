@@ -23,7 +23,7 @@ export function ServiceCard({ service, onSubcategoryClick }) {
   const hasImages = parseImageUrls(service.images).length > 0;
 
   return (
-    <div className="bg-white rounded-[30px] shadow-card p-5 flex flex-col gap-5">
+    <div className="bg-white dark:bg-[#0F2040] rounded-[30px] shadow-card p-5 flex flex-col gap-5">
       <ImageGallery images={service.images} />
 
       {/* Name + optional avatar + tags */}
@@ -64,7 +64,7 @@ export function ServiceCard({ service, onSubcategoryClick }) {
         {service.phone && (
           <div className="flex items-center gap-1.25">
             <PhoneIcon className="w-4 h-4 shrink-0 text-dark-blue" />
-            <a href={`tel:${service.phone}`} className="text-base text-brand-blue underline">
+            <a href={`tel:${service.phone}`} className="text-base text-brand-blue dark:text-[#60A5FA] underline">
               {service.phone}
             </a>
           </div>
@@ -72,7 +72,7 @@ export function ServiceCard({ service, onSubcategoryClick }) {
         {service.email && (
           <div className="flex items-center gap-1.25">
             <EmailIcon className="w-4 h-4 shrink-0 text-dark-blue" />
-            <a href={`mailto:${service.email}`} className="text-base text-brand-blue underline">
+            <a href={`mailto:${service.email}`} className="text-base text-brand-blue dark:text-[#60A5FA] underline">
               {service.email}
             </a>
           </div>
@@ -84,7 +84,7 @@ export function ServiceCard({ service, onSubcategoryClick }) {
               href={getSafeHref(service.website)}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-base text-brand-blue underline"
+              className="text-base text-brand-blue dark:text-[#60A5FA] underline"
             >
               {getDomain(service.website)}
             </a>
@@ -104,7 +104,7 @@ export function ServiceCard({ service, onSubcategoryClick }) {
           {isLong && (
             <button
               onClick={() => setExpanded(!expanded)}
-              className="flex items-center gap-1 text-brand-blue text-base cursor-pointer hover:opacity-80"
+              className="flex items-center gap-1 text-brand-blue dark:text-[#60A5FA] text-base cursor-pointer hover:opacity-80"
             >
               {expanded ? t('services.showLess') : t('services.showMore')}
               <ChevronDownIcon

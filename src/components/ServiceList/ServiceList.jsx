@@ -19,7 +19,7 @@ export function ServiceList({ services, loading, error, onRetry, title, onSubcat
                         {[...Array(6)].map((_, i) => (
                             <div
                                 key={i}
-                                className="bg-white rounded-2xl shadow-card p-5 animate-pulse"
+                                className="bg-white dark:bg-[#0F2040] rounded-2xl shadow-card p-5 animate-pulse"
                             >
                                 <div className="h-4 bg-gray rounded w-3/4 mb-3" />
                                 <div className="h-3 bg-gray rounded w-1/2 mb-2" />

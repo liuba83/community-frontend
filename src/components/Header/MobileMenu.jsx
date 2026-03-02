@@ -1,6 +1,7 @@
 import { CloseIcon } from '../UI/Icon';
 import { Button } from '../UI/Button';
 import { LanguageSelector } from './LanguageSelector';
+import { ThemeToggle } from './ThemeToggle';
 import { MobileCategoryMenu } from './CategoryMenu';
 import { useLanguage } from '../../hooks/useLanguage';
 
@@ -11,10 +12,13 @@ export function MobileMenu({ isOpen, onClose, onSelectCategory }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-white overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-white dark:bg-[#0A1628] overflow-y-auto">
       <div className="p-4">
         <div className="flex items-center justify-between mb-6">
-          <LanguageSelector />
+          <div className="flex items-center gap-3">
+            <LanguageSelector />
+            <ThemeToggle />
+          </div>
           <button onClick={onClose} className="p-2 cursor-pointer" aria-label="Close menu">
             <CloseIcon className="w-6 h-6 text-dark-blue" />
           </button>
