@@ -6,12 +6,26 @@ import { Footer } from '../components/Footer/Footer';
 import { useServices } from '../hooks/useServices';
 import { useLanguage } from '../hooks/useLanguage';
 
+/**
+ * HomePage is the main page of the application.
+ *
+ * Renders the full page layout with Header, Hero, service listings, and Footer.
+ *
+ * Service display has two modes:
+ * - **Default**: Shows up to 6 highlighted services (featured first, then recent)
+ *   followed by a second list of all remaining services.
+ * - **Filtering**: When a search query or category is active, shows a single
+ *   filtered list instead. A filter badge and "clear filters" link are displayed.
+ *
+ * Search and category filters are mutually exclusive — activating one clears the other.
+ */
 export function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
   const { services, loading, error, refetch } = useServices();
   const { t } = useLanguage();
 
+  // Services matching the active search query and/or selected category.
   const filteredServices = useMemo(() => {
     let result = services;
 
@@ -39,17 +53,20 @@ export function HomePage() {
 
   const isFiltering = searchQuery || selectedCategory;
 
+  // Up to 6 services shown in the featured section (featured ones first).
   const highlightedServices = useMemo(() => {
     const featured = services.filter((s) => s.featured);
     const recentNonFeatured = services.filter((s) => !s.featured);
     return [...featured, ...recentNonFeatured].slice(0, 6);
   }, [services]);
 
+  // All services not already shown in the highlighted section.
   const restServices = useMemo(() => {
     const highlightedIds = new Set(highlightedServices.map((s) => s.id));
     return services.filter((s) => !highlightedIds.has(s.id));
   }, [services, highlightedServices]);
 
+  // Search and category are mutually exclusive filters — activating one clears the other.
   function handleCategorySelect(subcategory) {
     setSelectedCategory(subcategory);
     setSearchQuery('');
@@ -57,6 +74,8 @@ export function HomePage() {
 
   function handleSearchChange(value) {
     setSearchQuery(value);
+    // Only clear the category when there is an active query; erasing the search text
+    // does not restore the category — use clearFilters() for a full reset.
     if (value) {
       setSelectedCategory(null);
     }
@@ -68,7 +87,7 @@ export function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-[#0A1628]">
       <Header onSelectCategory={handleCategorySelect} />
 
       <Hero

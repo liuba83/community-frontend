@@ -244,7 +244,7 @@ Using Google Drive for image storage. No automatic optimization.
 | Question | Decision |
 |----------|----------|
 | Domain name | TBD — use placeholder `https://example.com` in meta tags for now |
-| Contact email | TBD — use placeholder `admin@example.com` for now |
+| Contact email | `info@spilno.us` |
 | Approval criteria | Manual review by admin based on completeness and relevance |
 | Rejection flow | Not in MVP — will consider later |
 | Featured logic | Show newest 6 approved listings (no separate "featured" flag) |
