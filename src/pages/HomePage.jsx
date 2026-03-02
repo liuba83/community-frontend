@@ -66,6 +66,7 @@ export function HomePage() {
     return services.filter((s) => !highlightedIds.has(s.id));
   }, [services, highlightedServices]);
 
+  // Search and category are mutually exclusive filters — activating one clears the other.
   function handleCategorySelect(subcategory) {
     setSelectedCategory(subcategory);
     setSearchQuery('');
@@ -73,6 +74,8 @@ export function HomePage() {
 
   function handleSearchChange(value) {
     setSearchQuery(value);
+    // Only clear the category when there is an active query; erasing the search text
+    // does not restore the category — use clearFilters() for a full reset.
     if (value) {
       setSelectedCategory(null);
     }
