@@ -21,8 +21,9 @@ function localApiPlugin() {
           const category = url.searchParams.get('category') || undefined
           const limitParam = url.searchParams.get('limit')
           const limit = limitParam ? Number.parseInt(limitParam, 10) : undefined
+          const lang = url.searchParams.get('lang') || 'en'
 
-          const services = await fetchApprovedServices({ category, limit })
+          const services = await fetchApprovedServices({ category, limit, lang })
           res.statusCode = 200
           res.setHeader('Content-Type', 'application/json')
           res.end(JSON.stringify(services))

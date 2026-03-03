@@ -1,4 +1,4 @@
-export async function fetchApprovedServices({ category, limit } = {}) {
+export async function fetchApprovedServices({ category, limit, lang = 'en' } = {}) {
   const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
   const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
   const AIRTABLE_TABLE_NAME = process.env.AIRTABLE_TABLE_NAME || 'Services';
@@ -38,8 +38,16 @@ export async function fetchApprovedServices({ category, limit } = {}) {
 
   const data = await response.json();
 
-  return data.records.map((record) => ({
-    id: record.id,
-    ...record.fields,
-  }));
+  return data.records.map((record) => {
+    const f = record.fields;
+    const description =
+      lang === 'ua'
+        ? (f.description_ua || f.description)
+        : (f.description_en || f.description);
+    return {
+      id: record.id,
+      ...f,
+      description,
+    };
+  });
 }
