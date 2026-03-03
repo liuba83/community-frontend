@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { fetchServices } from '../services/api';
 
-export function useServices() {
+export function useServices({ lang } = {}) {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,7 +13,7 @@ export function useServices() {
       try {
         setLoading(true);
         setError(null);
-        const data = await fetchServices();
+        const data = await fetchServices({ lang });
         if (!cancelled) {
           setServices(data);
         }
@@ -30,10 +30,10 @@ export function useServices() {
 
     load();
     return () => { cancelled = true; };
-  }, []);
+  }, [lang]);
 
   return { services, loading, error, refetch: () => {
     setLoading(true);
-    fetchServices().then(setServices).catch((e) => setError(e.message)).finally(() => setLoading(false));
+    fetchServices({ lang }).then(setServices).catch((e) => setError(e.message)).finally(() => setLoading(false));
   }};
 }
