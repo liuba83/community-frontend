@@ -6,10 +6,11 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { category, limit } = req.query;
+    const { category, limit, lang } = req.query;
     const services = await fetchApprovedServices({
       category,
       limit: limit ? parseInt(limit, 10) : undefined,
+      lang: lang === 'ua' ? 'ua' : 'en',
     });
 
     res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');

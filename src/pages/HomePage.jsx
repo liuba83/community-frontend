@@ -22,8 +22,8 @@ import { useLanguage } from '../hooks/useLanguage';
 export function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const { services, loading, error, refetch } = useServices();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { services, loading, error, refetch } = useServices({ lang: language });
 
   // Services matching the active search query and/or selected category.
   const filteredServices = useMemo(() => {

@@ -1,9 +1,10 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
 
-export async function fetchServices({ category, limit } = {}) {
+export async function fetchServices({ category, limit, lang } = {}) {
   const params = new URLSearchParams();
   if (category) params.set('category', category);
   if (limit) params.set('limit', String(limit));
+  if (lang) params.set('lang', lang);
 
   const url = `${API_BASE}/services${params.toString() ? `?${params}` : ''}`;
   const response = await fetch(url);
