@@ -37,7 +37,7 @@ export function ImageGallery({ images }) {
 
   return (
     <div className="flex gap-2.5 h-55.5">
-      <div className="flex-1 min-w-0 rounded-[15px] overflow-hidden">
+      <div className="flex-1 min-w-0 rounded-l-[15px] overflow-hidden">
         <img
           src={first}
           alt=""
@@ -47,7 +47,7 @@ export function ImageGallery({ images }) {
         />
       </div>
       <div className="flex-1 min-w-0 flex flex-col gap-2.5">
-        <div className={`min-h-0 rounded-[15px] overflow-hidden ${hasThird ? 'flex-1' : 'h-full'}`}>
+        <div className={`min-h-0 overflow-hidden ${hasThird ? 'flex-1 rounded-tr-[15px]' : 'h-full rounded-r-[15px]'}`}>
           <img
             src={second}
             alt=""
@@ -57,7 +57,7 @@ export function ImageGallery({ images }) {
           />
         </div>
         {hasThird && (
-          <div className="flex-1 min-h-0 relative rounded-[15px] overflow-hidden">
+          <div className="flex-1 min-h-0 relative rounded-br-[15px] overflow-hidden">
             <img
               src={third}
               alt=""
