@@ -1,8 +1,12 @@
 export function convertGoogleDriveUrl(url) {
   if (!url) return null;
-  const match = url.match(/\/file\/d\/([^/]+)/);
-  if (match) {
-    return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+  const fileMatch = url.match(/\/file\/d\/([^/]+)/);
+  if (fileMatch) {
+    return `https://drive.google.com/thumbnail?id=${fileMatch[1]}&sz=w1000`;
+  }
+  const openMatch = url.match(/[?&]id=([^&]+)/);
+  if (openMatch) {
+    return `https://drive.google.com/thumbnail?id=${openMatch[1]}&sz=w1000`;
   }
   return url;
 }
