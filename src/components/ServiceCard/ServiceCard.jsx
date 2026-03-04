@@ -23,7 +23,7 @@ export function ServiceCard({ service, onSubcategoryClick }) {
   const hasImages = parseImageUrls(service.images).length > 0;
 
   return (
-    <div className="bg-white dark:bg-[#0F2040] rounded-[30px] shadow-card p-5 flex flex-col gap-5">
+    <div className="bg-white dark:bg-[#0F2040] rounded-[30px] shadow-card p-5 flex flex-col gap-5 relative">
       <ImageGallery images={service.images} />
 
       {/* Name + optional avatar + tags */}
@@ -92,28 +92,30 @@ export function ServiceCard({ service, onSubcategoryClick }) {
         )}
       </div>
 
-      {/* Description + show more/less + social links */}
-      <div>
+      {/* Description + show more/less */}
+      <div className="min-h-6 pr-20">
         {description && (
           <p className="text-base text-text leading-6">
             {displayDescription}
             {isLong && !expanded && '…'}
           </p>
         )}
-        <div className={`flex items-center ${isLong ? 'justify-between' : 'justify-end'}`}>
-          {isLong && (
-            <button
-              onClick={() => setExpanded(!expanded)}
-              className="flex items-center gap-1 text-brand-blue dark:text-[#60A5FA] text-base cursor-pointer hover:opacity-80"
-            >
-              {expanded ? t('services.showLess') : t('services.showMore')}
-              <ChevronDownIcon
-                className={`w-6 h-6 transition-transform ${expanded ? 'rotate-180' : ''}`}
-              />
-            </button>
-          )}
-          <SocialLinks service={service} />
-        </div>
+        {isLong && (
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="flex items-center gap-1 text-brand-blue dark:text-[#60A5FA] text-base cursor-pointer hover:opacity-80"
+          >
+            {expanded ? t('services.showLess') : t('services.showMore')}
+            <ChevronDownIcon
+              className={`w-6 h-6 transition-transform ${expanded ? 'rotate-180' : ''}`}
+            />
+          </button>
+        )}
+      </div>
+
+      {/* Social links pinned to bottom-right of card */}
+      <div className="absolute bottom-5 right-5">
+        <SocialLinks service={service} />
       </div>
     </div>
   );
