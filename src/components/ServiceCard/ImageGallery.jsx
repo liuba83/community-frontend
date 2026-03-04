@@ -10,6 +10,7 @@ export function ImageGallery({ images }) {
   const loadedUrls = urls.filter((url) => !failedImages.has(url));
 
   function handleError(url) {
+    console.error('[images] failed to load:', url);
     setFailedImages((prev) => new Set([...prev, url]));
   }
 
