@@ -9,18 +9,24 @@ Google Drive URLs submitted via Google Form (`drive.google.com/open?id=...`) req
 
 ## URL Conversion Fix
 
-`src/utils/imageUrl.js` handles two Google Drive URL formats:
+`src/utils/imageUrl.js` handles two Google Drive URL formats and converts both to the thumbnail embed format:
 
-- `/file/d/FILE_ID/...` → `drive.google.com/uc?export=view&id=FILE_ID`
-- `open?id=FILE_ID` → `drive.google.com/uc?export=view&id=FILE_ID`
+- `/file/d/FILE_ID/...` → `drive.google.com/thumbnail?id=FILE_ID&sz=w1000`
+- `open?id=FILE_ID` → `drive.google.com/thumbnail?id=FILE_ID&sz=w1000`
+
+> Note: `uc?export=view` was deprecated by Google and no longer works in `<img>` tags. The `thumbnail` endpoint is the reliable alternative.
 
 ## Making Files Publicly Accessible
 
 ### One-time bulk fix (Google Apps Script)
 
 1. Go to [script.google.com](https://script.google.com) → **New project**
-2. Paste the script below, replacing `YOUR_FOLDER_ID` with the ID from the folder's URL (the part after `/folders/`)
-3. Click **Run** → authorize when prompted
+2. Paste the script below, replacing `YOUR_FOLDER_ID` with the folder ID from Google Drive:
+   - Open the folder in Google Drive
+   - The URL looks like `drive.google.com/drive/folders/`**`1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs`**
+   - Copy that last segment — that's the folder ID
+3. Click **Run** (▶) → Google will ask to authorize → click through the permissions
+4. Check **View → Logs** to confirm files were made public
 
 ```js
 function makeFilesPublic() {
