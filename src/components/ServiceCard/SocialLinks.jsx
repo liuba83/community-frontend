@@ -1,4 +1,4 @@
-import { getSafeHref } from '../../utils/validation';
+import { getSafeHref, isValidURL } from '../../utils/validation';
 import { InstagramIcon, FacebookIcon, LinkedInIcon, MessengerIcon } from '../UI/Icon';
 
 const socialConfig = [
@@ -9,7 +9,7 @@ const socialConfig = [
 ];
 
 export function SocialLinks({ service }) {
-  const links = socialConfig.filter(({ key }) => service[key]);
+  const links = socialConfig.filter(({ key }) => isValidURL(service[key]) && service[key]);
 
   if (links.length === 0) return null;
 
