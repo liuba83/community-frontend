@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Combobox,
@@ -69,6 +69,7 @@ export function AddServiceForm() {
   const [touched, setTouched] = useState({});
   const [status, setStatus] = useState('idle');
   const [query, setQuery] = useState('');
+  const optionsRef = useRef(null);
 
   const inputClass = (hasError) =>
     `w-full rounded-xl border ${hasError ? 'border-brand-red' : 'border-stroke'} bg-white dark:bg-[#0A1628] text-text px-4 py-3 text-base focus:outline-none focus:border-brand-blue placeholder:text-text/40 transition-colors`;
@@ -162,6 +163,7 @@ export function AddServiceForm() {
       >
         <div className="relative">
           <Combobox
+            immediate
             value={formData.category}
             onChange={(val) => {
               handleChange('category', val || '');
@@ -172,10 +174,11 @@ export function AddServiceForm() {
               className={inputClass(touched.category && errors.category)}
               onChange={(e) => setQuery(e.target.value)}
               onBlur={() => handleBlur('category')}
+              onFocus={() => requestAnimationFrame(() => { if (optionsRef.current) optionsRef.current.scrollTop = 0; })}
               displayValue={(val) => val || ''}
               placeholder={t('addService.fields.categoryPlaceholder')}
             />
-            <ComboboxOptions className="absolute z-10 w-full mt-1 bg-white dark:bg-[#0F2040] border border-stroke rounded-2xl shadow-card overflow-y-auto max-h-64">
+            <ComboboxOptions ref={optionsRef} className="absolute z-10 w-full mt-1 bg-white dark:bg-[#0F2040] border border-stroke rounded-2xl shadow-card overflow-y-auto max-h-64">
               {grouped.length === 0 ? (
                 <div className="px-3 py-4 text-sm text-text/50">{t('addService.noResults')}</div>
               ) : (
