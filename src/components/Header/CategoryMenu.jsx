@@ -27,14 +27,14 @@ export function CategoryMenu({ onSelectCategory }) {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="hidden md:flex items-center gap-1.5 px-[25px] py-[15px] text-dark-blue font-semibold text-lg hover:bg-light-gray rounded-[25px] transition-colors cursor-pointer"
+        className="hidden md:flex items-center gap-1.5 px-[25px] py-[15px] text-dark-blue font-semibold text-lg hover:bg-light-gray dark:hover:bg-white/10 rounded-[25px] transition-colors cursor-pointer"
       >
         {t('header.allServices')}
         <ChevronDownIcon className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-card border border-stroke p-6 z-50 w-[800px] max-h-[70vh] overflow-y-auto">
+        <div className="absolute top-full left-0 mt-2 bg-white dark:bg-gray dark:border-stroke rounded-xl shadow-card border border-stroke p-6 z-50 w-200 max-h-[70vh] overflow-y-auto">
           <div className="grid grid-cols-4 gap-6">
             {categories.map((cat) => (
               <div key={cat.name}>
@@ -47,7 +47,7 @@ export function CategoryMenu({ onSelectCategory }) {
                     <li key={sub}>
                       <button
                         onClick={() => handleSelect(sub)}
-                        className="text-sm text-text hover:text-brand-blue transition-colors text-left w-full cursor-pointer"
+                        className="text-sm text-text hover:text-brand-blue dark:hover:text-dark-blue transition-colors text-left w-full cursor-pointer"
                       >
                         {t(`subcategories.${sub}`)}
                       </button>
