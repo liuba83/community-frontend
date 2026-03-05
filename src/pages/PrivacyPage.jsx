@@ -9,7 +9,7 @@ const content = {
     sections: [
       {
         heading: 'What we collect',
-        text: 'We display information voluntarily submitted by service providers: name, business name, service description, contact details, and location. This information is submitted via a public Google Form and is intended to be publicly visible.',
+        text: 'We display information voluntarily submitted by service providers: name, business name, service description, contact details, and location. This information is submitted through our website and is intended to be publicly visible.',
       },
       {
         heading: 'How we use it',
@@ -35,7 +35,7 @@ const content = {
     sections: [
       {
         heading: 'Що ми збираємо',
-        text: 'Ми відображаємо інформацію, добровільно надану постачальниками послуг: ім\'я, назву бізнесу, опис послуг, контактні дані та місцезнаходження. Ця інформація подається через публічну Google-форму та призначена для відкритого перегляду.',
+        text: 'Ми відображаємо інформацію, добровільно надану постачальниками послуг: ім\'я, назву бізнесу, опис послуг, контактні дані та місцезнаходження. Ця інформація подається через наш сайт та призначена для відкритого перегляду.',
       },
       {
         heading: 'Як ми її використовуємо',

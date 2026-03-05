@@ -11,7 +11,6 @@ import { useLanguage } from "../../hooks/useLanguage";
 export function Header({ onSelectCategory }) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { t } = useLanguage();
-    const googleFormUrl = import.meta.env.VITE_GOOGLE_FORM_URL || "#";
 
     return (
         <>
@@ -30,7 +29,7 @@ export function Header({ onSelectCategory }) {
                             <ThemeToggle />
                         </div>
                         <div className="hidden md:block">
-                            <Button href={googleFormUrl}>
+                            <Button to="/add-service">
                                 {t("header.addService")}
                             </Button>
                         </div>

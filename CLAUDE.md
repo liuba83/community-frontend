@@ -55,7 +55,7 @@ api/                # Vercel serverless functions (proxy to Airtable)
 
 ## Environment Variables
 Client-side (prefix `VITE_`):
-- `VITE_GOOGLE_FORM_URL`
+
 - `VITE_CONTACT_EMAIL`
 - `VITE_API_BASE_URL`
 
