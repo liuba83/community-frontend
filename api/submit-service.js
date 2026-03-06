@@ -15,6 +15,7 @@ export default async function handler(req, res) {
     instagram,
     facebook,
     linkedin,
+    imageUrls,
     honeypot,
   } = req.body || {};
 
@@ -51,6 +52,13 @@ export default async function handler(req, res) {
   if (instagram?.trim()) fields.instagram = instagram.trim();
   if (facebook?.trim()) fields.facebook = facebook.trim();
   if (linkedin?.trim()) fields.linkedin = linkedin.trim();
+
+  const validImageUrls = Array.isArray(imageUrls)
+    ? imageUrls
+        .filter((u) => typeof u === 'string' && u.startsWith('https://res.cloudinary.com/'))
+        .slice(0, 5)
+    : [];
+  if (validImageUrls.length > 0) fields.images = validImageUrls.join(',');
 
   try {
     const response = await fetch(

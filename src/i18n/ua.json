@@ -74,7 +74,10 @@
       "facebook": "Facebook",
       "facebookHint": "Формат: https://facebook.com/USERNAME",
       "linkedin": "LinkedIn",
-      "linkedinHint": "Формат: https://linkedin.com/USERNAME"
+      "linkedinHint": "Формат: https://linkedin.com/USERNAME",
+      "images": "Фотографії",
+      "imagesHint": "До 5 фотографій, макс. 5 МБ кожна",
+      "imagesAdd": "Додати фото"
     },
     "errors": {
       "categoryRequired": "Будь ласка, оберіть категорію",
@@ -89,7 +92,9 @@
       "instagramInvalid": "Має бути дійсний URL instagram.com",
       "facebookInvalid": "Має бути дійсний URL facebook.com",
       "linkedinInvalid": "Має бути дійсний URL linkedin.com",
-      "consentRequired": "Будь ласка, погодьтеся з умовами для подання"
+      "consentRequired": "Будь ласка, погодьтеся з умовами для подання",
+      "imageTooLarge": "Файл перевищує ліміт 5 МБ",
+      "imageUploadFailed": "Помилка завантаження. Натисніть, щоб спробувати знову."
     },
     "optionalSection": "Необов'язково",
     "noResults": "Відповідних послуг не знайдено",

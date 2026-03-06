@@ -74,7 +74,10 @@
             "facebook": "Facebook",
             "facebookHint": "Format: https://facebook.com/USERNAME",
             "linkedin": "LinkedIn",
-            "linkedinHint": "Format: https://linkedin.com/USERNAME"
+            "linkedinHint": "Format: https://linkedin.com/USERNAME",
+            "images": "Photos",
+            "imagesHint": "Up to 5 photos, max 5 MB each",
+            "imagesAdd": "Add photos"
         },
         "errors": {
             "categoryRequired": "Please select a category",
@@ -89,7 +92,9 @@
             "instagramInvalid": "Must be a valid instagram.com URL",
             "facebookInvalid": "Must be a valid facebook.com URL",
             "linkedinInvalid": "Must be a valid linkedin.com URL",
-            "consentRequired": "Please agree to the terms to submit"
+            "consentRequired": "Please agree to the terms to submit",
+            "imageTooLarge": "File exceeds 5 MB limit",
+            "imageUploadFailed": "Upload failed. Click to retry."
         },
         "optionalSection": "Optional",
         "noResults": "No matching services found",

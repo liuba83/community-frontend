@@ -23,7 +23,7 @@ function localApiPlugin() {
           const body = JSON.parse(Buffer.concat(chunks).toString())
 
           const { category, businessName, descriptionEn, descriptionUa, phone, email,
-                  address, website, instagram, facebook, linkedin, honeypot } = body
+                  address, website, instagram, facebook, linkedin, imageUrls, honeypot } = body
 
           if (honeypot) { res.statusCode = 200; res.end(JSON.stringify({ success: true })); return }
 
@@ -48,6 +48,11 @@ function localApiPlugin() {
           if (instagram?.trim()) fields.instagram = instagram.trim()
           if (facebook?.trim()) fields.facebook = facebook.trim()
           if (linkedin?.trim()) fields.linkedin = linkedin.trim()
+
+          const validImageUrls = Array.isArray(imageUrls)
+            ? imageUrls.filter((u) => typeof u === 'string' && u.startsWith('https://res.cloudinary.com/')).slice(0, 5)
+            : []
+          if (validImageUrls.length > 0) fields.images = validImageUrls.join(',')
 
           const atRes = await fetch(
             `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_TABLE_NAME)}`,
