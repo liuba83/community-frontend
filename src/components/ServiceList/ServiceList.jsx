@@ -4,8 +4,6 @@ import { useLanguage } from "../../hooks/useLanguage";
 
 export function ServiceList({ services, loading, error, onRetry, title, onSubcategoryClick }) {
     const { t } = useLanguage();
-    const googleFormUrl = import.meta.env.VITE_GOOGLE_FORM_URL || "#";
-
     if (loading) {
         return (
             <section className="py-12 px-4">
@@ -53,7 +51,7 @@ export function ServiceList({ services, loading, error, onRetry, title, onSubcat
                     <p className="text-text/70 mb-4">
                         {t("services.emptyCategory")}
                     </p>
-                    <Button href={googleFormUrl}>
+                    <Button to="/add-service">
                         {t("header.addService")}
                     </Button>
                 </div>
