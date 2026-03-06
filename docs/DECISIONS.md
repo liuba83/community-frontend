@@ -116,9 +116,9 @@ Key architectural and technical decisions for the Ukrainians in Texas service di
 
 ## Decision 3: Image Hosting — Google Drive vs Alternatives
 
-**Decision:** Use **Google Drive** (via Google Forms uploads)
-**Date:** 2026-02-15
-**Status:** ✅ Accepted
+**Decision:** Use **Cloudinary**
+**Date:** 2026-03-05
+**Status:** ✅ Accepted (migrated from Google Drive)
 
 ### Alternatives Considered
 

@@ -107,7 +107,7 @@ export function HomePage() {
             )}
             <button
               onClick={clearFilters}
-              className="text-brand-blue hover:underline cursor-pointer"
+              className="text-brand-blue dark:text-brand-red underline font-medium hover:opacity-80 cursor-pointer"
             >
               {t('services.clearFilters')}
             </button>

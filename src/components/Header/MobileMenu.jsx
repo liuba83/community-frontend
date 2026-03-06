@@ -7,8 +7,6 @@ import { useLanguage } from '../../hooks/useLanguage';
 
 export function MobileMenu({ isOpen, onClose, onSelectCategory }) {
   const { t } = useLanguage();
-  const googleFormUrl = import.meta.env.VITE_GOOGLE_FORM_URL || '#';
-
   if (!isOpen) return null;
 
   return (
@@ -25,7 +23,7 @@ export function MobileMenu({ isOpen, onClose, onSelectCategory }) {
         </div>
 
         <div className="mb-6">
-          <Button href={googleFormUrl} className="w-full text-center">
+          <Button to="/add-service" className="w-full text-center">
             {t('header.addService')}
           </Button>
         </div>

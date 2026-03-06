@@ -9,7 +9,7 @@ const content = {
     sections: [
       {
         heading: 'What we collect',
-        text: 'We display information voluntarily submitted by service providers: name, business name, service description, contact details, and location. This information is submitted via a public Google Form and is intended to be publicly visible.',
+        text: 'We display information voluntarily submitted by service providers: name, business name, service description, contact details, and location. This information is submitted through our website and is intended to be publicly visible.',
       },
       {
         heading: 'How we use it',
@@ -35,7 +35,7 @@ const content = {
     sections: [
       {
         heading: 'Що ми збираємо',
-        text: 'Ми відображаємо інформацію, добровільно надану постачальниками послуг: ім\'я, назву бізнесу, опис послуг, контактні дані та місцезнаходження. Ця інформація подається через публічну Google-форму та призначена для відкритого перегляду.',
+        text: 'Ми відображаємо інформацію, добровільно надану постачальниками послуг: ім\'я, назву бізнесу, опис послуг, контактні дані та місцезнаходження. Ця інформація подається через наш сайт та призначена для відкритого перегляду.',
       },
       {
         heading: 'Як ми її використовуємо',
@@ -63,16 +63,16 @@ export function PrivacyPage() {
   const contactEmail = import.meta.env.VITE_CONTACT_EMAIL || 'info@spilno.us';
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-[#0A1628] flex flex-col">
       <Header />
       <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-12">
-        <h1 className="text-3xl font-bold text-dark-blue mb-1">{c.title}</h1>
-        <p className="text-sm text-text/50 mb-10">{c.updated}</p>
+        <h1 className="text-3xl font-bold text-dark-blue dark:text-white mb-1">{c.title}</h1>
+        <p className="text-sm text-text/50 dark:text-white/40 mb-10">{c.updated}</p>
         <div className="space-y-8">
           {c.sections.map((section) => (
             <section key={section.heading}>
-              <h2 className="text-base font-bold text-dark-blue mb-2">{section.heading}</h2>
-              <p className="text-sm text-text/70 leading-relaxed">
+              <h2 className="text-base font-bold text-dark-blue dark:text-white/90 mb-2">{section.heading}</h2>
+              <p className="text-sm text-text/70 dark:text-white/60 leading-relaxed">
                 {section.text}
                 {section.heading === 'Contact' || section.heading === 'Контакт' ? (
                   <>
