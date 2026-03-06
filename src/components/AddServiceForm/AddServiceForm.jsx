@@ -16,9 +16,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 async function uploadToCloudinary(file) {
     const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-    console.log("cloudName ===> ", cloudName);
     const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
-    console.log("uploadPreset ===> ", uploadPreset);
     if (!cloudName || !uploadPreset)
         throw new Error("Cloudinary not configured");
     const body = new FormData();
@@ -175,6 +173,7 @@ export function AddServiceForm() {
         `w-full rounded-xl border ${hasError ? "border-brand-red" : "border-stroke"} bg-white dark:bg-[#0A1628] text-text px-4 py-3 text-base focus:outline-none focus:border-brand-blue placeholder:text-text/40 transition-colors`;
 
     const handleChange = (field, value) => {
+        if (status === "error") setStatus("idle");
         setFormData((prev) => ({ ...prev, [field]: value }));
         if (touched[field]) {
             const err = validate({ ...formData, [field]: value })[field];
@@ -233,7 +232,9 @@ export function AddServiceForm() {
                 (sub) =>
                     query === "" ||
                     sub.toLowerCase().includes(query.toLowerCase()) ||
-                    cat.name.toLowerCase().includes(query.toLowerCase()),
+                    t(`subcategories.${sub}`)
+                        .toLowerCase()
+                        .includes(query.toLowerCase()),
             ),
         }))
         .filter((cat) => cat.subs.length > 0);
@@ -315,7 +316,9 @@ export function AddServiceForm() {
                                         optionsRef.current.scrollTop = 0;
                                 })
                             }
-                            displayValue={(val) => val || ""}
+                            displayValue={(val) =>
+                                val ? t(`subcategories.${val}`) : ""
+                            }
                             placeholder={t(
                                 "addService.fields.categoryPlaceholder",
                             )}
@@ -332,7 +335,8 @@ export function AddServiceForm() {
                                 grouped.map((cat) => (
                                     <div key={cat.name}>
                                         <div className="text-xs font-bold text-text/50 uppercase px-3 pt-3 pb-1 select-none">
-                                            {cat.icon} {cat.name}
+                                            {cat.icon}{" "}
+                                            {t(`categories.${cat.name}`)}
                                         </div>
                                         {cat.subs.map((sub) => (
                                             <ComboboxOption
@@ -340,7 +344,7 @@ export function AddServiceForm() {
                                                 value={sub}
                                                 className="px-3 py-2 text-base text-text cursor-pointer data-[focus]:bg-light-gray data-[focus]:dark:bg-[#1E3A5F] data-[focus]:text-dark-blue"
                                             >
-                                                {sub}
+                                                {t(`subcategories.${sub}`)}
                                             </ComboboxOption>
                                         ))}
                                     </div>
