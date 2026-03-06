@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
     Combobox,
@@ -32,6 +32,16 @@ async function uploadToCloudinary(file) {
     if (!res.ok) throw new Error("Upload failed");
     const data = await res.json();
     return data.secure_url;
+}
+
+function deleteFromCloudinary(cloudUrl) {
+    const match = cloudUrl.match(/\/upload\/(?:v\d+\/)?(.+)\.[^.]+$/);
+    if (!match) return;
+    fetch("/api/delete-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ publicId: match[1] }),
+    }).catch(() => {});
 }
 
 function validate(data) {
@@ -100,6 +110,42 @@ export function AddServiceForm() {
     const [query, setQuery] = useState("");
     const [images, setImages] = useState([]);
     const optionsRef = useRef(null);
+    const imagesRef = useRef(images);
+    imagesRef.current = images;
+    const wasSubmittedRef = useRef(false);
+    const removedIdsRef = useRef(new Set());
+    const pageUnloadingRef = useRef(false);
+
+    useEffect(() => {
+        const handleBeforeUnload = () => {
+            if (wasSubmittedRef.current) return;
+            pageUnloadingRef.current = true;
+            imagesRef.current
+                .filter((img) => img.cloudUrl)
+                .forEach((img) => {
+                    const match = img.cloudUrl.match(
+                        /\/upload\/(?:v\d+\/)?(.+)\.[^.]+$/,
+                    );
+                    if (!match) return;
+                    navigator.sendBeacon(
+                        "/api/delete-image",
+                        new Blob([JSON.stringify({ publicId: match[1] })], {
+                            type: "application/json",
+                        }),
+                    );
+                });
+        };
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+            if (wasSubmittedRef.current || pageUnloadingRef.current) return;
+            imagesRef.current
+                .filter((img) => img.cloudUrl)
+                .forEach((img) => deleteFromCloudinary(img.cloudUrl));
+        };
+    }, []);
 
     const handleImageSelect = (e) => {
         const files = Array.from(e.target.files);
@@ -117,15 +163,19 @@ export function AddServiceForm() {
                 { id, previewUrl, cloudUrl: null, status: "uploading" },
             ]);
             uploadToCloudinary(file)
-                .then((cloudUrl) =>
-                    setImages((prev) =>
-                        prev.map((img) =>
-                            img.id === id
-                                ? { ...img, cloudUrl, status: "done" }
-                                : img,
-                        ),
-                    ),
-                )
+                .then((cloudUrl) => {
+                    if (removedIdsRef.current.has(id)) {
+                        deleteFromCloudinary(cloudUrl);
+                    } else {
+                        setImages((prev) =>
+                            prev.map((img) =>
+                                img.id === id
+                                    ? { ...img, cloudUrl, status: "done" }
+                                    : img,
+                            ),
+                        );
+                    }
+                })
                 .catch(() =>
                     setImages((prev) =>
                         prev.map((img) =>
@@ -145,13 +195,19 @@ export function AddServiceForm() {
         fetch(img.previewUrl)
             .then((r) => r.blob())
             .then((blob) => uploadToCloudinary(new File([blob], "image")))
-            .then((cloudUrl) =>
-                setImages((prev) =>
-                    prev.map((i) =>
-                        i.id === id ? { ...i, cloudUrl, status: "done" } : i,
-                    ),
-                ),
-            )
+            .then((cloudUrl) => {
+                if (removedIdsRef.current.has(id)) {
+                    deleteFromCloudinary(cloudUrl);
+                } else {
+                    setImages((prev) =>
+                        prev.map((i) =>
+                            i.id === id
+                                ? { ...i, cloudUrl, status: "done" }
+                                : i,
+                        ),
+                    );
+                }
+            })
             .catch(() =>
                 setImages((prev) =>
                     prev.map((i) =>
@@ -162,11 +218,11 @@ export function AddServiceForm() {
     };
 
     const removeImage = (id) => {
-        setImages((prev) => {
-            const img = prev.find((i) => i.id === id);
-            if (img?.previewUrl) URL.revokeObjectURL(img.previewUrl);
-            return prev.filter((i) => i.id !== id);
-        });
+        removedIdsRef.current.add(id);
+        const img = images.find((i) => i.id === id);
+        if (img?.previewUrl) URL.revokeObjectURL(img.previewUrl);
+        if (img?.cloudUrl) deleteFromCloudinary(img.cloudUrl);
+        setImages((prev) => prev.filter((i) => i.id !== id));
     };
 
     const inputClass = (hasError) =>
@@ -210,6 +266,7 @@ export function AddServiceForm() {
             });
             const data = await res.json();
             if (res.ok && data.success) {
+                wasSubmittedRef.current = true;
                 setStatus("success");
                 setFormData(INITIAL);
                 setErrors({});
