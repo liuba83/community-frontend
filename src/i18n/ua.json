@@ -44,10 +44,10 @@
     "Other Services": "Інші послуги"
   },
   "quickTags": {
-    "Lawyer": "Юрист",
-    "Cleaning": "Прибирання",
-    "Doctors / Clinics": "Лікарі",
-    "Handyman": "Майстер"
+    "Realtors / Brokers": "Ріелтори",
+    "Music / Art Classes for Kids": "Музика та мистецтво",
+    "Brow & Lash Services": "Брови та вії",
+    "Manicure / Nail Services": "Нігті"
   },
   "footer": {
     "copyright": "Українці в Техасі",
@@ -79,6 +79,7 @@
       "linkedinHint": "Формат: https://linkedin.com/USERNAME",
       "images": "Фотографії",
       "imagesHint": "До 5 фотографій, макс. 5 МБ кожна",
+      "imagesReorderHint": "Перетягніть для сортування · Перше фото — обкладинка",
       "imagesAdd": "Додати фото",
       "imagesDrop": "Перетягніть або натисніть для завантаження"
     },
@@ -108,8 +109,11 @@
     "submit": "Надіслати",
     "waitForImages": "Зачекайте, поки фото завантажаться",
     "submitting": "Надсилання...",
-    "success": "Дякуємо! Ваш запис надіслано і з'явиться після перевірки.",
+    "success": "Ваш запис надіслано і з'явиться після перевірки.",
+    "successTitle": "Дякуємо!",
     "backHome": "На головну",
+    "submitAnother": "Додати ще один запис",
+    "coverLabel": "Обкладинка",
     "error": "Щось пішло не так. Спробуйте ще раз.",
     "retry": "Спробувати знову"
   },

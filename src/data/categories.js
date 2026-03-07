@@ -226,13 +226,13 @@ export const categories = [
   },
 ];
 
-export const quickTags = ['Lawyer', 'Cleaning', 'Doctors / Clinics', 'Handyman'];
+export const quickTags = ['Realtors / Brokers', 'Music / Art Classes for Kids', 'Brow & Lash Services', 'Manicure / Nail Services'];
 
 export const quickTagIcons = {
-  'Lawyer': '⚖️',
-  'Cleaning': '🧹',
-  'Doctors / Clinics': '🏥',
-  'Handyman': '🔧',
+  'Realtors / Brokers': '🏠',
+  'Music / Art Classes for Kids': '🎵',
+  'Brow & Lash Services': '✨',
+  'Manicure / Nail Services': '💅',
 };
 
 export function findParentCategory(subcategory) {

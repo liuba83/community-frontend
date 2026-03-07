@@ -71,6 +71,29 @@ function validate(data) {
     return e;
 }
 
+function normalizeUrl(value, field) {
+    const v = value.trim();
+    if (!v) return v;
+    if (/^https?:\/\//i.test(v)) return v;
+    if (field === "website") return v.includes(".") ? `https://${v}` : v;
+    if (field === "instagram") {
+        if (v.startsWith("@")) return `https://instagram.com/${v.slice(1)}`;
+        if (/instagram\.com/i.test(v)) return `https://${v}`;
+        return `https://instagram.com/${v}`;
+    }
+    if (field === "facebook") {
+        if (v.startsWith("@")) return `https://facebook.com/${v.slice(1)}`;
+        if (/facebook\.com/i.test(v)) return `https://${v}`;
+        return `https://facebook.com/${v}`;
+    }
+    if (field === "linkedin") {
+        if (v.startsWith("@")) return `https://linkedin.com/in/${v.slice(1)}`;
+        if (/linkedin\.com/i.test(v)) return `https://${v}`;
+        return `https://linkedin.com/in/${v}`;
+    }
+    return v;
+}
+
 function FormField({ label, hint, error, required, children, htmlFor }) {
     return (
         <div className="flex flex-col gap-1">
@@ -80,7 +103,7 @@ function FormField({ label, hint, error, required, children, htmlFor }) {
             </label>
             {children}
             {error ? (
-                <p className="text-xs text-brand-red">{error}</p>
+                <p id={htmlFor ? `${htmlFor}-error` : undefined} role="alert" className="text-xs text-brand-red">{error}</p>
             ) : hint ? (
                 <p className="text-xs text-text/50">{hint}</p>
             ) : null}
@@ -122,6 +145,8 @@ export function AddServiceForm() {
     const [imageError, setImageError] = useState("");
     const fileInputRef = useRef(null);
     const dragCountRef = useRef(0);
+    const [draggingId, setDraggingId] = useState(null);
+    const [dragOverId, setDragOverId] = useState(null);
 
     useEffect(() => {
         const handleBeforeUnload = () => {
@@ -205,11 +230,13 @@ export function AddServiceForm() {
 
     const handleDragEnter = (e) => {
         e.preventDefault();
+        if (!e.dataTransfer.types.includes("Files")) return;
         dragCountRef.current++;
         setIsDragging(true);
     };
 
-    const handleDragLeave = () => {
+    const handleDragLeave = (e) => {
+        if (!e.dataTransfer.types.includes("Files")) return;
         dragCountRef.current--;
         if (dragCountRef.current === 0) setIsDragging(false);
     };
@@ -267,6 +294,43 @@ export function AddServiceForm() {
         setImages((prev) => prev.filter((i) => i.id !== id));
     };
 
+    const handleImageDragStart = (e, id) => {
+        e.stopPropagation();
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", id);
+        setDraggingId(id);
+    };
+
+    const handleImageDragOver = (e, id) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (id !== draggingId) setDragOverId(id);
+    };
+
+    const handleImageDrop = (e, targetId) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!draggingId || draggingId === targetId) {
+            setDraggingId(null);
+            setDragOverId(null);
+            return;
+        }
+        setImages((prev) => {
+            const from = prev.findIndex((i) => i.id === draggingId);
+            const to = prev.findIndex((i) => i.id === targetId);
+            const next = [...prev];
+            next.splice(to, 0, next.splice(from, 1)[0]);
+            return next;
+        });
+        setDraggingId(null);
+        setDragOverId(null);
+    };
+
+    const handleImageDragEnd = () => {
+        setDraggingId(null);
+        setDragOverId(null);
+    };
+
     const inputClass = (hasError) =>
         `w-full rounded-xl border ${hasError ? "border-brand-red" : "border-stroke"} bg-white dark:bg-[#0A1628] text-text px-4 py-3 text-base focus:outline-none focus:border-brand-blue placeholder:text-text/40 transition-colors`;
 
@@ -282,6 +346,15 @@ export function AddServiceForm() {
     const handleBlur = (field) => {
         setTouched((prev) => ({ ...prev, [field]: true }));
         const err = validate(formData)[field];
+        setErrors((prev) => ({ ...prev, [field]: err }));
+    };
+
+    const handleSocialBlur = (field) => {
+        const normalized = normalizeUrl(formData[field], field);
+        const newFormData = { ...formData, [field]: normalized };
+        setFormData(newFormData);
+        setTouched((prev) => ({ ...prev, [field]: true }));
+        const err = validate(newFormData)[field];
         setErrors((prev) => ({ ...prev, [field]: err }));
     };
 
@@ -344,16 +417,47 @@ export function AddServiceForm() {
 
     if (status === "success") {
         return (
-            <div className="text-center py-8 flex flex-col items-center gap-4">
-                <p className="text-brand-blue text-lg font-bold">
-                    {t("addService.success")}
-                </p>
-                <Link
-                    to="/"
-                    className="text-brand-blue hover:underline text-base"
-                >
-                    {t("addService.backHome")}
-                </Link>
+            <div className="text-center py-8 flex flex-col items-center gap-6">
+                <div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                    <svg
+                        className="w-10 h-10 text-green-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                        />
+                    </svg>
+                </div>
+                <div className="flex flex-col gap-2">
+                    <p className="text-2xl font-bold text-dark-blue">
+                        {t("addService.successTitle")}
+                    </p>
+                    <p className="text-text/60 text-base max-w-sm mx-auto">
+                        {t("addService.success")}
+                    </p>
+                </div>
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                    <Button
+                        type="button"
+                        onClick={() => {
+                            wasSubmittedRef.current = false;
+                            setStatus("idle");
+                        }}
+                    >
+                        {t("addService.submitAnother")}
+                    </Button>
+                    <Link
+                        to="/"
+                        className="text-brand-blue hover:underline text-base"
+                    >
+                        {t("addService.backHome")}
+                    </Link>
+                </div>
             </div>
         );
     }
@@ -410,6 +514,8 @@ export function AddServiceForm() {
                     >
                         <ComboboxInput
                             id="category"
+                            aria-describedby="category-error"
+                            aria-invalid={!!(touched.category && errors.category)}
                             className={inputClass(
                                 touched.category && errors.category,
                             )}
@@ -475,6 +581,8 @@ export function AddServiceForm() {
                     id="businessName"
                     type="text"
                     maxLength={100}
+                    aria-describedby="businessName-error"
+                    aria-invalid={!!(touched.businessName && errors.businessName)}
                     value={formData.businessName}
                     onChange={(e) =>
                         handleChange("businessName", e.target.value)
@@ -506,6 +614,8 @@ export function AddServiceForm() {
                     id="descriptionEn"
                     rows={4}
                     maxLength={600}
+                    aria-describedby="descriptionEn-error"
+                    aria-invalid={!!(touched.descriptionEn && errors.descriptionEn)}
                     value={formData.descriptionEn}
                     onChange={(e) =>
                         handleChange("descriptionEn", e.target.value)
@@ -534,6 +644,8 @@ export function AddServiceForm() {
                     id="descriptionUa"
                     rows={4}
                     maxLength={600}
+                    aria-describedby="descriptionUa-error"
+                    aria-invalid={!!(touched.descriptionUa && errors.descriptionUa)}
                     value={formData.descriptionUa}
                     onChange={(e) =>
                         handleChange("descriptionUa", e.target.value)
@@ -560,6 +672,8 @@ export function AddServiceForm() {
                 <input
                     id="phone"
                     type="tel"
+                    aria-describedby="phone-error"
+                    aria-invalid={!!(touched.phone && errors.phone)}
                     value={formData.phone}
                     onChange={(e) => handleChange("phone", e.target.value)}
                     onBlur={() => handleBlur("phone")}
@@ -582,6 +696,8 @@ export function AddServiceForm() {
                 <input
                     id="email"
                     type="email"
+                    aria-describedby="email-error"
+                    aria-invalid={!!(touched.email && errors.email)}
                     value={formData.email}
                     onChange={(e) => handleChange("email", e.target.value)}
                     onBlur={() => handleBlur("email")}
@@ -628,11 +744,13 @@ export function AddServiceForm() {
                     <input
                         id="website"
                         type="url"
+                        aria-describedby="website-error"
+                        aria-invalid={!!(touched.website && errors.website)}
                         value={formData.website}
                         onChange={(e) =>
                             handleChange("website", e.target.value)
                         }
-                        onBlur={() => handleBlur("website")}
+                        onBlur={() => handleSocialBlur("website")}
                         className={inputClass(
                             touched.website && errors.website,
                         )}
@@ -654,11 +772,13 @@ export function AddServiceForm() {
                     <input
                         id="instagram"
                         type="url"
+                        aria-describedby="instagram-error"
+                        aria-invalid={!!(touched.instagram && errors.instagram)}
                         value={formData.instagram}
                         onChange={(e) =>
                             handleChange("instagram", e.target.value)
                         }
-                        onBlur={() => handleBlur("instagram")}
+                        onBlur={() => handleSocialBlur("instagram")}
                         className={inputClass(
                             touched.instagram && errors.instagram,
                         )}
@@ -679,11 +799,13 @@ export function AddServiceForm() {
                     <input
                         id="facebook"
                         type="url"
+                        aria-describedby="facebook-error"
+                        aria-invalid={!!(touched.facebook && errors.facebook)}
                         value={formData.facebook}
                         onChange={(e) =>
                             handleChange("facebook", e.target.value)
                         }
-                        onBlur={() => handleBlur("facebook")}
+                        onBlur={() => handleSocialBlur("facebook")}
                         className={inputClass(
                             touched.facebook && errors.facebook,
                         )}
@@ -704,11 +826,13 @@ export function AddServiceForm() {
                     <input
                         id="linkedin"
                         type="url"
+                        aria-describedby="linkedin-error"
+                        aria-invalid={!!(touched.linkedin && errors.linkedin)}
                         value={formData.linkedin}
                         onChange={(e) =>
                             handleChange("linkedin", e.target.value)
                         }
-                        onBlur={() => handleBlur("linkedin")}
+                        onBlur={() => handleSocialBlur("linkedin")}
                         className={inputClass(
                             touched.linkedin && errors.linkedin,
                         )}
@@ -718,7 +842,7 @@ export function AddServiceForm() {
                 {/* Images */}
                 <FormField
                     label={t("addService.fields.images")}
-                    hint={!imageError ? t("addService.fields.imagesHint") : undefined}
+                    hint={!imageError ? (images.length >= 2 ? t("addService.fields.imagesReorderHint") : t("addService.fields.imagesHint")) : undefined}
                     error={imageError || undefined}
                 >
                     <input
@@ -767,16 +891,26 @@ export function AddServiceForm() {
                             onDragOver={handleDragOver}
                             onDrop={handleDrop}
                         >
-                            {images.map((img) => (
+                            {images.map((img, index) => (
                                 <div
                                     key={img.id}
-                                    className="relative w-20 h-20"
+                                    draggable
+                                    onDragStart={(e) => handleImageDragStart(e, img.id)}
+                                    onDragOver={(e) => handleImageDragOver(e, img.id)}
+                                    onDrop={(e) => handleImageDrop(e, img.id)}
+                                    onDragEnd={handleImageDragEnd}
+                                    className={`relative w-20 h-20 cursor-grab active:cursor-grabbing select-none transition-opacity ${draggingId === img.id ? "opacity-40" : ""} ${dragOverId === img.id ? "ring-2 ring-brand-blue rounded-xl" : ""}`}
                                 >
                                     <img
                                         src={img.previewUrl}
                                         alt=""
                                         className="w-full h-full object-cover rounded-xl"
                                     />
+                                    {index === 0 && images.length > 1 && (
+                                        <span className="absolute bottom-0 left-0 right-0 rounded-b-xl bg-black/60 text-white text-[10px] text-center py-0.5 leading-tight pointer-events-none">
+                                            {t("addService.coverLabel")}
+                                        </span>
+                                    )}
                                     {img.status === "uploading" && (
                                         <div className="absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center">
                                             <SpinnerIcon className="w-5 h-5 text-white animate-spin" />
@@ -826,6 +960,8 @@ export function AddServiceForm() {
                 <label className="flex items-start gap-3 cursor-pointer">
                     <input
                         type="checkbox"
+                        aria-describedby="consent-error"
+                        aria-invalid={!!(touched.consent && errors.consent)}
                         checked={formData.consent}
                         onChange={(e) =>
                             handleChange("consent", e.target.checked)
@@ -844,7 +980,7 @@ export function AddServiceForm() {
                     </span>
                 </label>
                 {touched.consent && errors.consent && (
-                    <p className="text-xs text-brand-red">
+                    <p id="consent-error" role="alert" className="text-xs text-brand-red">
                         {t(`addService.errors.${errors.consent}`)}
                     </p>
                 )}
