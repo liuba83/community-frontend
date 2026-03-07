@@ -44,10 +44,10 @@
         "Other Services": "Other Services"
     },
     "quickTags": {
-        "Lawyer": "Lawyer",
-        "Cleaning": "Cleaning",
-        "Doctors / Clinics": "Doctors",
-        "Handyman": "Handyman"
+        "Realtors / Brokers": "Realtors",
+        "Music / Art Classes for Kids": "Music & Art",
+        "Brow & Lash Services": "Brow & Lash",
+        "Manicure / Nail Services": "Nails"
     },
     "footer": {
         "copyright": "Ukrainians in Texas",
@@ -79,6 +79,7 @@
             "linkedinHint": "Format: https://linkedin.com/USERNAME",
             "images": "Photos",
             "imagesHint": "Up to 5 photos, max 5 MB each",
+            "imagesReorderHint": "Drag to reorder · First image is the cover",
             "imagesAdd": "Add photos",
             "imagesDrop": "Drag & drop or tap to upload"
         },
@@ -108,8 +109,11 @@
         "submit": "Submit",
         "waitForImages": "Please wait while photos finish uploading",
         "submitting": "Submitting...",
-        "success": "Thank you! Your listing has been submitted and will appear after review.",
+        "success": "Your listing has been submitted and will appear after review.",
+        "successTitle": "Thank you!",
         "backHome": "Back to home",
+        "submitAnother": "Submit another listing",
+        "coverLabel": "Cover",
         "error": "Something went wrong. Please try again.",
         "retry": "Try again"
     },
