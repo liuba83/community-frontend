@@ -71,6 +71,29 @@ function validate(data) {
     return e;
 }
 
+function normalizeUrl(value, field) {
+    const v = value.trim();
+    if (!v) return v;
+    if (/^https?:\/\//i.test(v)) return v;
+    if (field === "website") return v.includes(".") ? `https://${v}` : v;
+    if (field === "instagram") {
+        if (v.startsWith("@")) return `https://instagram.com/${v.slice(1)}`;
+        if (/instagram\.com/i.test(v)) return `https://${v}`;
+        return `https://instagram.com/${v}`;
+    }
+    if (field === "facebook") {
+        if (v.startsWith("@")) return `https://facebook.com/${v.slice(1)}`;
+        if (/facebook\.com/i.test(v)) return `https://${v}`;
+        return `https://facebook.com/${v}`;
+    }
+    if (field === "linkedin") {
+        if (v.startsWith("@")) return `https://linkedin.com/in/${v.slice(1)}`;
+        if (/linkedin\.com/i.test(v)) return `https://${v}`;
+        return `https://linkedin.com/in/${v}`;
+    }
+    return v;
+}
+
 function FormField({ label, hint, error, required, children, htmlFor }) {
     return (
         <div className="flex flex-col gap-1">
@@ -323,6 +346,15 @@ export function AddServiceForm() {
     const handleBlur = (field) => {
         setTouched((prev) => ({ ...prev, [field]: true }));
         const err = validate(formData)[field];
+        setErrors((prev) => ({ ...prev, [field]: err }));
+    };
+
+    const handleSocialBlur = (field) => {
+        const normalized = normalizeUrl(formData[field], field);
+        const newFormData = { ...formData, [field]: normalized };
+        setFormData(newFormData);
+        setTouched((prev) => ({ ...prev, [field]: true }));
+        const err = validate(newFormData)[field];
         setErrors((prev) => ({ ...prev, [field]: err }));
     };
 
@@ -704,7 +736,7 @@ export function AddServiceForm() {
                         onChange={(e) =>
                             handleChange("website", e.target.value)
                         }
-                        onBlur={() => handleBlur("website")}
+                        onBlur={() => handleSocialBlur("website")}
                         className={inputClass(
                             touched.website && errors.website,
                         )}
@@ -730,7 +762,7 @@ export function AddServiceForm() {
                         onChange={(e) =>
                             handleChange("instagram", e.target.value)
                         }
-                        onBlur={() => handleBlur("instagram")}
+                        onBlur={() => handleSocialBlur("instagram")}
                         className={inputClass(
                             touched.instagram && errors.instagram,
                         )}
@@ -755,7 +787,7 @@ export function AddServiceForm() {
                         onChange={(e) =>
                             handleChange("facebook", e.target.value)
                         }
-                        onBlur={() => handleBlur("facebook")}
+                        onBlur={() => handleSocialBlur("facebook")}
                         className={inputClass(
                             touched.facebook && errors.facebook,
                         )}
@@ -780,7 +812,7 @@ export function AddServiceForm() {
                         onChange={(e) =>
                             handleChange("linkedin", e.target.value)
                         }
-                        onBlur={() => handleBlur("linkedin")}
+                        onBlur={() => handleSocialBlur("linkedin")}
                         className={inputClass(
                             touched.linkedin && errors.linkedin,
                         )}
