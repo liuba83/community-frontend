@@ -73,6 +73,50 @@ function localApiPlugin() {
         }
       })
 
+      server.middlewares.use('/api/delete-image', async (req, res) => {
+        res.setHeader('Content-Type', 'application/json')
+
+        if (req.method !== 'POST') {
+          res.statusCode = 405
+          res.end(JSON.stringify({ error: 'Method not allowed' }))
+          return
+        }
+
+        try {
+          const chunks = []
+          for await (const chunk of req) chunks.push(chunk)
+          const { publicId } = JSON.parse(Buffer.concat(chunks).toString())
+
+          if (!publicId || typeof publicId !== 'string') {
+            res.statusCode = 400; res.end(JSON.stringify({ error: 'Missing publicId' })); return
+          }
+
+          const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env
+
+          if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
+            res.statusCode = 500; res.end(JSON.stringify({ error: 'Server configuration error' })); return
+          }
+
+          const credentials = Buffer.from(`${CLOUDINARY_API_KEY}:${CLOUDINARY_API_SECRET}`).toString('base64')
+          const cloudRes = await fetch(
+            `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/resources/image/upload?public_ids[]=${encodeURIComponent(publicId)}`,
+            { method: 'DELETE', headers: { Authorization: `Basic ${credentials}` } },
+          )
+
+          if (!cloudRes.ok) {
+            console.error('Cloudinary delete error:', await cloudRes.text())
+            res.statusCode = 500; res.end(JSON.stringify({ error: 'Failed to delete image' })); return
+          }
+
+          res.statusCode = 200
+          res.end(JSON.stringify({ success: true }))
+        } catch (error) {
+          console.error('Delete error:', error)
+          res.statusCode = 500
+          res.end(JSON.stringify({ error: 'Failed to delete' }))
+        }
+      })
+
       server.middlewares.use('/api/services', async (req, res) => {
         if (req.method !== 'GET') {
           res.statusCode = 405
@@ -110,6 +154,9 @@ export default defineConfig(({ mode }) => {
   process.env.AIRTABLE_API_KEY ||= env.AIRTABLE_API_KEY
   process.env.AIRTABLE_BASE_ID ||= env.AIRTABLE_BASE_ID
   process.env.AIRTABLE_TABLE_NAME ||= env.AIRTABLE_TABLE_NAME
+  process.env.CLOUDINARY_CLOUD_NAME ||= env.CLOUDINARY_CLOUD_NAME
+  process.env.CLOUDINARY_API_KEY ||= env.CLOUDINARY_API_KEY
+  process.env.CLOUDINARY_API_SECRET ||= env.CLOUDINARY_API_SECRET
 
   return {
     plugins: [react(), tailwindcss(), localApiPlugin()],

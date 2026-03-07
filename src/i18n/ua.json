@@ -77,7 +77,8 @@
       "linkedinHint": "Формат: https://linkedin.com/USERNAME",
       "images": "Фотографії",
       "imagesHint": "До 5 фотографій, макс. 5 МБ кожна",
-      "imagesAdd": "Додати фото"
+      "imagesAdd": "Додати фото",
+      "imagesDrop": "Перетягніть або натисніть для завантаження"
     },
     "errors": {
       "categoryRequired": "Будь ласка, оберіть категорію",
