@@ -48,8 +48,11 @@ function validate(data) {
     const e = {};
     if (!data.category) e.category = "categoryRequired";
     if (!data.businessName.trim()) e.businessName = "businessNameRequired";
+    else if (data.businessName.length > 100) e.businessName = "businessNameTooLong";
     if (!data.descriptionEn.trim()) e.descriptionEn = "descriptionEnRequired";
+    else if (data.descriptionEn.length > 600) e.descriptionEn = "descriptionTooLong";
     if (!data.descriptionUa.trim()) e.descriptionUa = "descriptionUaRequired";
+    else if (data.descriptionUa.length > 600) e.descriptionUa = "descriptionTooLong";
     if (!data.phone.trim()) e.phone = "phoneRequired";
     else if (!/^[\d\s+\-()]+$/.test(data.phone.trim()))
         e.phone = "phoneInvalid";
@@ -68,10 +71,10 @@ function validate(data) {
     return e;
 }
 
-function FormField({ label, hint, error, required, children }) {
+function FormField({ label, hint, error, required, children, htmlFor }) {
     return (
         <div className="flex flex-col gap-1">
-            <label className="text-sm font-bold text-dark-blue">
+            <label htmlFor={htmlFor} className="text-sm font-bold text-dark-blue">
                 {label}
                 {required && <span className="text-brand-red ml-1">*</span>}
             </label>
@@ -116,6 +119,7 @@ export function AddServiceForm() {
     const removedIdsRef = useRef(new Set());
     const pageUnloadingRef = useRef(false);
     const [isDragging, setIsDragging] = useState(false);
+    const [imageError, setImageError] = useState("");
     const fileInputRef = useRef(null);
     const dragCountRef = useRef(0);
 
@@ -151,12 +155,14 @@ export function AddServiceForm() {
     }, []);
 
     const processFiles = (files) => {
+        setImageError("");
         const remaining = MAX_IMAGES - images.length;
+        let hasOversized = false;
         Array.from(files)
             .slice(0, remaining)
             .forEach((file) => {
                 if (file.size > MAX_FILE_SIZE) {
-                    alert(t("addService.errors.imageTooLarge"));
+                    hasOversized = true;
                     return;
                 }
                 const id = Math.random().toString(36).slice(2);
@@ -189,6 +195,7 @@ export function AddServiceForm() {
                         ),
                     );
             });
+        if (hasOversized) setImageError(t("addService.errors.imageTooLarge"));
     };
 
     const handleImageSelect = (e) => {
@@ -285,7 +292,11 @@ export function AddServiceForm() {
         setTouched(
             Object.fromEntries(Object.keys(INITIAL).map((k) => [k, true])),
         );
-        if (Object.keys(allErrors).length > 0) return;
+        if (Object.keys(allErrors).length > 0) {
+            const firstKey = Object.keys(allErrors)[0];
+            document.getElementById(firstKey)?.scrollIntoView({ behavior: "smooth", block: "center" });
+            return;
+        }
 
         setStatus("submitting");
         try {
@@ -381,6 +392,7 @@ export function AddServiceForm() {
             <FormField
                 label={t("addService.fields.category")}
                 required
+                htmlFor="category"
                 error={
                     touched.category && errors.category
                         ? t(`addService.errors.${errors.category}`)
@@ -397,6 +409,7 @@ export function AddServiceForm() {
                         }}
                     >
                         <ComboboxInput
+                            id="category"
                             className={inputClass(
                                 touched.category && errors.category,
                             )}
@@ -451,6 +464,7 @@ export function AddServiceForm() {
             <FormField
                 label={t("addService.fields.businessName")}
                 required
+                htmlFor="businessName"
                 error={
                     touched.businessName && errors.businessName
                         ? t(`addService.errors.${errors.businessName}`)
@@ -458,7 +472,9 @@ export function AddServiceForm() {
                 }
             >
                 <input
+                    id="businessName"
                     type="text"
+                    maxLength={100}
                     value={formData.businessName}
                     onChange={(e) =>
                         handleChange("businessName", e.target.value)
@@ -469,12 +485,17 @@ export function AddServiceForm() {
                     )}
                     autoComplete="organization"
                 />
+                <p className={`text-xs text-right mt-1 ${formData.businessName.length >= 90 ? "text-brand-red" : "text-gray-400"}`}>
+                    {formData.businessName.length}/100
+                </p>
             </FormField>
 
             {/* Description EN */}
             <FormField
                 label={t("addService.fields.descriptionEn")}
                 required
+                htmlFor="descriptionEn"
+                hint={t("addService.fields.descriptionEnHint")}
                 error={
                     touched.descriptionEn && errors.descriptionEn
                         ? t(`addService.errors.${errors.descriptionEn}`)
@@ -482,7 +503,9 @@ export function AddServiceForm() {
                 }
             >
                 <textarea
+                    id="descriptionEn"
                     rows={4}
+                    maxLength={600}
                     value={formData.descriptionEn}
                     onChange={(e) =>
                         handleChange("descriptionEn", e.target.value)
@@ -490,12 +513,17 @@ export function AddServiceForm() {
                     onBlur={() => handleBlur("descriptionEn")}
                     className={`${inputClass(touched.descriptionEn && errors.descriptionEn)} resize-none`}
                 />
+                <p className={`text-xs text-right mt-1 ${formData.descriptionEn.length >= 550 ? "text-brand-red" : "text-gray-400"}`}>
+                    {formData.descriptionEn.length}/600
+                </p>
             </FormField>
 
             {/* Description UA */}
             <FormField
                 label={t("addService.fields.descriptionUa")}
                 required
+                htmlFor="descriptionUa"
+                hint={t("addService.fields.descriptionUaHint")}
                 error={
                     touched.descriptionUa && errors.descriptionUa
                         ? t(`addService.errors.${errors.descriptionUa}`)
@@ -503,7 +531,9 @@ export function AddServiceForm() {
                 }
             >
                 <textarea
+                    id="descriptionUa"
                     rows={4}
+                    maxLength={600}
                     value={formData.descriptionUa}
                     onChange={(e) =>
                         handleChange("descriptionUa", e.target.value)
@@ -511,12 +541,16 @@ export function AddServiceForm() {
                     onBlur={() => handleBlur("descriptionUa")}
                     className={`${inputClass(touched.descriptionUa && errors.descriptionUa)} resize-none`}
                 />
+                <p className={`text-xs text-right mt-1 ${formData.descriptionUa.length >= 550 ? "text-brand-red" : "text-gray-400"}`}>
+                    {formData.descriptionUa.length}/600
+                </p>
             </FormField>
 
             {/* Phone */}
             <FormField
                 label={t("addService.fields.phone")}
                 required
+                htmlFor="phone"
                 error={
                     touched.phone && errors.phone
                         ? t(`addService.errors.${errors.phone}`)
@@ -524,6 +558,7 @@ export function AddServiceForm() {
                 }
             >
                 <input
+                    id="phone"
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => handleChange("phone", e.target.value)}
@@ -537,6 +572,7 @@ export function AddServiceForm() {
             <FormField
                 label={t("addService.fields.email")}
                 required
+                htmlFor="email"
                 error={
                     touched.email && errors.email
                         ? t(`addService.errors.${errors.email}`)
@@ -544,6 +580,7 @@ export function AddServiceForm() {
                 }
             >
                 <input
+                    id="email"
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleChange("email", e.target.value)}
@@ -563,8 +600,10 @@ export function AddServiceForm() {
                 <FormField
                     label={t("addService.fields.address")}
                     hint={t("addService.fields.addressHint")}
+                    htmlFor="address"
                 >
                     <input
+                        id="address"
                         type="text"
                         value={formData.address}
                         onChange={(e) =>
@@ -579,6 +618,7 @@ export function AddServiceForm() {
                 <FormField
                     label={t("addService.fields.website")}
                     hint={t("addService.fields.websiteHint")}
+                    htmlFor="website"
                     error={
                         touched.website && errors.website
                             ? t(`addService.errors.${errors.website}`)
@@ -586,6 +626,7 @@ export function AddServiceForm() {
                     }
                 >
                     <input
+                        id="website"
                         type="url"
                         value={formData.website}
                         onChange={(e) =>
@@ -603,6 +644,7 @@ export function AddServiceForm() {
                 <FormField
                     label={t("addService.fields.instagram")}
                     hint={t("addService.fields.instagramHint")}
+                    htmlFor="instagram"
                     error={
                         touched.instagram && errors.instagram
                             ? t(`addService.errors.${errors.instagram}`)
@@ -610,6 +652,7 @@ export function AddServiceForm() {
                     }
                 >
                     <input
+                        id="instagram"
                         type="url"
                         value={formData.instagram}
                         onChange={(e) =>
@@ -626,6 +669,7 @@ export function AddServiceForm() {
                 <FormField
                     label={t("addService.fields.facebook")}
                     hint={t("addService.fields.facebookHint")}
+                    htmlFor="facebook"
                     error={
                         touched.facebook && errors.facebook
                             ? t(`addService.errors.${errors.facebook}`)
@@ -633,6 +677,7 @@ export function AddServiceForm() {
                     }
                 >
                     <input
+                        id="facebook"
                         type="url"
                         value={formData.facebook}
                         onChange={(e) =>
@@ -649,6 +694,7 @@ export function AddServiceForm() {
                 <FormField
                     label={t("addService.fields.linkedin")}
                     hint={t("addService.fields.linkedinHint")}
+                    htmlFor="linkedin"
                     error={
                         touched.linkedin && errors.linkedin
                             ? t(`addService.errors.${errors.linkedin}`)
@@ -656,6 +702,7 @@ export function AddServiceForm() {
                     }
                 >
                     <input
+                        id="linkedin"
                         type="url"
                         value={formData.linkedin}
                         onChange={(e) =>
@@ -671,7 +718,8 @@ export function AddServiceForm() {
                 {/* Images */}
                 <FormField
                     label={t("addService.fields.images")}
-                    hint={t("addService.fields.imagesHint")}
+                    hint={!imageError ? t("addService.fields.imagesHint") : undefined}
+                    error={imageError || undefined}
                 >
                     <input
                         ref={fileInputRef}
@@ -821,6 +869,11 @@ export function AddServiceForm() {
                         t("addService.submit")
                     )}
                 </Button>
+                {images.some((i) => i.status === "uploading") && (
+                    <p className="text-xs text-text/50">
+                        {t("addService.waitForImages")}
+                    </p>
+                )}
                 {status === "error" && (
                     <p className="text-sm text-brand-red">
                         {t("addService.error")}
