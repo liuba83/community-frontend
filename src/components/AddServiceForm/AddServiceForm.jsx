@@ -344,16 +344,47 @@ export function AddServiceForm() {
 
     if (status === "success") {
         return (
-            <div className="text-center py-8 flex flex-col items-center gap-4">
-                <p className="text-brand-blue text-lg font-bold">
-                    {t("addService.success")}
-                </p>
-                <Link
-                    to="/"
-                    className="text-brand-blue hover:underline text-base"
-                >
-                    {t("addService.backHome")}
-                </Link>
+            <div className="text-center py-8 flex flex-col items-center gap-6">
+                <div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                    <svg
+                        className="w-10 h-10 text-green-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                        />
+                    </svg>
+                </div>
+                <div className="flex flex-col gap-2">
+                    <p className="text-2xl font-bold text-dark-blue">
+                        {t("addService.successTitle")}
+                    </p>
+                    <p className="text-text/60 text-base max-w-sm mx-auto">
+                        {t("addService.success")}
+                    </p>
+                </div>
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                    <Button
+                        type="button"
+                        onClick={() => {
+                            wasSubmittedRef.current = false;
+                            setStatus("idle");
+                        }}
+                    >
+                        {t("addService.submitAnother")}
+                    </Button>
+                    <Link
+                        to="/"
+                        className="text-brand-blue hover:underline text-base"
+                    >
+                        {t("addService.backHome")}
+                    </Link>
+                </div>
             </div>
         );
     }

@@ -108,8 +108,10 @@
         "submit": "Submit",
         "waitForImages": "Please wait while photos finish uploading",
         "submitting": "Submitting...",
-        "success": "Thank you! Your listing has been submitted and will appear after review.",
+        "success": "Your listing has been submitted and will appear after review.",
+        "successTitle": "Thank you!",
         "backHome": "Back to home",
+        "submitAnother": "Submit another listing",
         "error": "Something went wrong. Please try again.",
         "retry": "Try again"
     },
