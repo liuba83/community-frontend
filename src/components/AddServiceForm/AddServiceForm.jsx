@@ -122,6 +122,8 @@ export function AddServiceForm() {
     const [imageError, setImageError] = useState("");
     const fileInputRef = useRef(null);
     const dragCountRef = useRef(0);
+    const [draggingId, setDraggingId] = useState(null);
+    const [dragOverId, setDragOverId] = useState(null);
 
     useEffect(() => {
         const handleBeforeUnload = () => {
@@ -205,11 +207,13 @@ export function AddServiceForm() {
 
     const handleDragEnter = (e) => {
         e.preventDefault();
+        if (!e.dataTransfer.types.includes("Files")) return;
         dragCountRef.current++;
         setIsDragging(true);
     };
 
-    const handleDragLeave = () => {
+    const handleDragLeave = (e) => {
+        if (!e.dataTransfer.types.includes("Files")) return;
         dragCountRef.current--;
         if (dragCountRef.current === 0) setIsDragging(false);
     };
@@ -265,6 +269,43 @@ export function AddServiceForm() {
         if (img?.previewUrl) URL.revokeObjectURL(img.previewUrl);
         if (img?.cloudUrl) deleteFromCloudinary(img.cloudUrl);
         setImages((prev) => prev.filter((i) => i.id !== id));
+    };
+
+    const handleImageDragStart = (e, id) => {
+        e.stopPropagation();
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", id);
+        setDraggingId(id);
+    };
+
+    const handleImageDragOver = (e, id) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (id !== draggingId) setDragOverId(id);
+    };
+
+    const handleImageDrop = (e, targetId) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!draggingId || draggingId === targetId) {
+            setDraggingId(null);
+            setDragOverId(null);
+            return;
+        }
+        setImages((prev) => {
+            const from = prev.findIndex((i) => i.id === draggingId);
+            const to = prev.findIndex((i) => i.id === targetId);
+            const next = [...prev];
+            next.splice(to, 0, next.splice(from, 1)[0]);
+            return next;
+        });
+        setDraggingId(null);
+        setDragOverId(null);
+    };
+
+    const handleImageDragEnd = () => {
+        setDraggingId(null);
+        setDragOverId(null);
     };
 
     const inputClass = (hasError) =>
@@ -749,7 +790,7 @@ export function AddServiceForm() {
                 {/* Images */}
                 <FormField
                     label={t("addService.fields.images")}
-                    hint={!imageError ? t("addService.fields.imagesHint") : undefined}
+                    hint={!imageError ? (images.length >= 2 ? t("addService.fields.imagesReorderHint") : t("addService.fields.imagesHint")) : undefined}
                     error={imageError || undefined}
                 >
                     <input
@@ -798,16 +839,26 @@ export function AddServiceForm() {
                             onDragOver={handleDragOver}
                             onDrop={handleDrop}
                         >
-                            {images.map((img) => (
+                            {images.map((img, index) => (
                                 <div
                                     key={img.id}
-                                    className="relative w-20 h-20"
+                                    draggable
+                                    onDragStart={(e) => handleImageDragStart(e, img.id)}
+                                    onDragOver={(e) => handleImageDragOver(e, img.id)}
+                                    onDrop={(e) => handleImageDrop(e, img.id)}
+                                    onDragEnd={handleImageDragEnd}
+                                    className={`relative w-20 h-20 cursor-grab active:cursor-grabbing select-none transition-opacity ${draggingId === img.id ? "opacity-40" : ""} ${dragOverId === img.id ? "ring-2 ring-brand-blue rounded-xl" : ""}`}
                                 >
                                     <img
                                         src={img.previewUrl}
                                         alt=""
                                         className="w-full h-full object-cover rounded-xl"
                                     />
+                                    {index === 0 && images.length > 1 && (
+                                        <span className="absolute bottom-0 left-0 right-0 rounded-b-xl bg-black/60 text-white text-[10px] text-center py-0.5 leading-tight pointer-events-none">
+                                            {t("addService.coverLabel")}
+                                        </span>
+                                    )}
                                     {img.status === "uploading" && (
                                         <div className="absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center">
                                             <SpinnerIcon className="w-5 h-5 text-white animate-spin" />

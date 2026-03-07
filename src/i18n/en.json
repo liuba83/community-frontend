@@ -79,6 +79,7 @@
             "linkedinHint": "Format: https://linkedin.com/USERNAME",
             "images": "Photos",
             "imagesHint": "Up to 5 photos, max 5 MB each",
+            "imagesReorderHint": "Drag to reorder · First image is the cover",
             "imagesAdd": "Add photos",
             "imagesDrop": "Drag & drop or tap to upload"
         },
@@ -112,6 +113,7 @@
         "successTitle": "Thank you!",
         "backHome": "Back to home",
         "submitAnother": "Submit another listing",
+        "coverLabel": "Cover",
         "error": "Something went wrong. Please try again.",
         "retry": "Try again"
     },
