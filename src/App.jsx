@@ -4,6 +4,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { HomePage } from './pages/HomePage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { AddServicePage } from './pages/AddServicePage';
+import { BackToTop } from './components/UI/BackToTop';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/add-service" element={<AddServicePage />} />
           </Routes>
+          <BackToTop />
         </LanguageProvider>
       </ThemeProvider>
     </BrowserRouter>
