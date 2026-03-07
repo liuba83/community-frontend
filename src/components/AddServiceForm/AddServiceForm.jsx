@@ -103,7 +103,7 @@ function FormField({ label, hint, error, required, children, htmlFor }) {
             </label>
             {children}
             {error ? (
-                <p className="text-xs text-brand-red">{error}</p>
+                <p id={htmlFor ? `${htmlFor}-error` : undefined} role="alert" className="text-xs text-brand-red">{error}</p>
             ) : hint ? (
                 <p className="text-xs text-text/50">{hint}</p>
             ) : null}
@@ -514,6 +514,8 @@ export function AddServiceForm() {
                     >
                         <ComboboxInput
                             id="category"
+                            aria-describedby="category-error"
+                            aria-invalid={!!(touched.category && errors.category)}
                             className={inputClass(
                                 touched.category && errors.category,
                             )}
@@ -579,6 +581,8 @@ export function AddServiceForm() {
                     id="businessName"
                     type="text"
                     maxLength={100}
+                    aria-describedby="businessName-error"
+                    aria-invalid={!!(touched.businessName && errors.businessName)}
                     value={formData.businessName}
                     onChange={(e) =>
                         handleChange("businessName", e.target.value)
@@ -610,6 +614,8 @@ export function AddServiceForm() {
                     id="descriptionEn"
                     rows={4}
                     maxLength={600}
+                    aria-describedby="descriptionEn-error"
+                    aria-invalid={!!(touched.descriptionEn && errors.descriptionEn)}
                     value={formData.descriptionEn}
                     onChange={(e) =>
                         handleChange("descriptionEn", e.target.value)
@@ -638,6 +644,8 @@ export function AddServiceForm() {
                     id="descriptionUa"
                     rows={4}
                     maxLength={600}
+                    aria-describedby="descriptionUa-error"
+                    aria-invalid={!!(touched.descriptionUa && errors.descriptionUa)}
                     value={formData.descriptionUa}
                     onChange={(e) =>
                         handleChange("descriptionUa", e.target.value)
@@ -664,6 +672,8 @@ export function AddServiceForm() {
                 <input
                     id="phone"
                     type="tel"
+                    aria-describedby="phone-error"
+                    aria-invalid={!!(touched.phone && errors.phone)}
                     value={formData.phone}
                     onChange={(e) => handleChange("phone", e.target.value)}
                     onBlur={() => handleBlur("phone")}
@@ -686,6 +696,8 @@ export function AddServiceForm() {
                 <input
                     id="email"
                     type="email"
+                    aria-describedby="email-error"
+                    aria-invalid={!!(touched.email && errors.email)}
                     value={formData.email}
                     onChange={(e) => handleChange("email", e.target.value)}
                     onBlur={() => handleBlur("email")}
@@ -732,6 +744,8 @@ export function AddServiceForm() {
                     <input
                         id="website"
                         type="url"
+                        aria-describedby="website-error"
+                        aria-invalid={!!(touched.website && errors.website)}
                         value={formData.website}
                         onChange={(e) =>
                             handleChange("website", e.target.value)
@@ -758,6 +772,8 @@ export function AddServiceForm() {
                     <input
                         id="instagram"
                         type="url"
+                        aria-describedby="instagram-error"
+                        aria-invalid={!!(touched.instagram && errors.instagram)}
                         value={formData.instagram}
                         onChange={(e) =>
                             handleChange("instagram", e.target.value)
@@ -783,6 +799,8 @@ export function AddServiceForm() {
                     <input
                         id="facebook"
                         type="url"
+                        aria-describedby="facebook-error"
+                        aria-invalid={!!(touched.facebook && errors.facebook)}
                         value={formData.facebook}
                         onChange={(e) =>
                             handleChange("facebook", e.target.value)
@@ -808,6 +826,8 @@ export function AddServiceForm() {
                     <input
                         id="linkedin"
                         type="url"
+                        aria-describedby="linkedin-error"
+                        aria-invalid={!!(touched.linkedin && errors.linkedin)}
                         value={formData.linkedin}
                         onChange={(e) =>
                             handleChange("linkedin", e.target.value)
@@ -940,6 +960,8 @@ export function AddServiceForm() {
                 <label className="flex items-start gap-3 cursor-pointer">
                     <input
                         type="checkbox"
+                        aria-describedby="consent-error"
+                        aria-invalid={!!(touched.consent && errors.consent)}
                         checked={formData.consent}
                         onChange={(e) =>
                             handleChange("consent", e.target.checked)
@@ -958,7 +980,7 @@ export function AddServiceForm() {
                     </span>
                 </label>
                 {touched.consent && errors.consent && (
-                    <p className="text-xs text-brand-red">
+                    <p id="consent-error" role="alert" className="text-xs text-brand-red">
                         {t(`addService.errors.${errors.consent}`)}
                     </p>
                 )}
