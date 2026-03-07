@@ -77,7 +77,8 @@
             "linkedinHint": "Format: https://linkedin.com/USERNAME",
             "images": "Photos",
             "imagesHint": "Up to 5 photos, max 5 MB each",
-            "imagesAdd": "Add photos"
+            "imagesAdd": "Add photos",
+            "imagesDrop": "Drag & drop or tap to upload"
         },
         "errors": {
             "categoryRequired": "Please select a category",

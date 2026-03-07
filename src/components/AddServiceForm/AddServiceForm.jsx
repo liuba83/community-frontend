@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
     Combobox,
@@ -32,6 +32,16 @@ async function uploadToCloudinary(file) {
     if (!res.ok) throw new Error("Upload failed");
     const data = await res.json();
     return data.secure_url;
+}
+
+function deleteFromCloudinary(cloudUrl) {
+    const match = cloudUrl.match(/\/upload\/(?:v\d+\/)?(.+)\.[^.]+$/);
+    if (!match) return;
+    fetch("/api/delete-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ publicId: match[1] }),
+    }).catch(() => {});
 }
 
 function validate(data) {
@@ -100,40 +110,115 @@ export function AddServiceForm() {
     const [query, setQuery] = useState("");
     const [images, setImages] = useState([]);
     const optionsRef = useRef(null);
+    const imagesRef = useRef(images);
+    imagesRef.current = images;
+    const wasSubmittedRef = useRef(false);
+    const removedIdsRef = useRef(new Set());
+    const pageUnloadingRef = useRef(false);
+    const [isDragging, setIsDragging] = useState(false);
+    const fileInputRef = useRef(null);
+    const dragCountRef = useRef(0);
+
+    useEffect(() => {
+        const handleBeforeUnload = () => {
+            if (wasSubmittedRef.current) return;
+            pageUnloadingRef.current = true;
+            imagesRef.current
+                .filter((img) => img.cloudUrl)
+                .forEach((img) => {
+                    const match = img.cloudUrl.match(
+                        /\/upload\/(?:v\d+\/)?(.+)\.[^.]+$/,
+                    );
+                    if (!match) return;
+                    navigator.sendBeacon(
+                        "/api/delete-image",
+                        new Blob([JSON.stringify({ publicId: match[1] })], {
+                            type: "application/json",
+                        }),
+                    );
+                });
+        };
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+            if (wasSubmittedRef.current || pageUnloadingRef.current) return;
+            imagesRef.current
+                .filter((img) => img.cloudUrl)
+                .forEach((img) => deleteFromCloudinary(img.cloudUrl));
+        };
+    }, []);
+
+    const processFiles = (files) => {
+        const remaining = MAX_IMAGES - images.length;
+        Array.from(files)
+            .slice(0, remaining)
+            .forEach((file) => {
+                if (file.size > MAX_FILE_SIZE) {
+                    alert(t("addService.errors.imageTooLarge"));
+                    return;
+                }
+                const id = Math.random().toString(36).slice(2);
+                const previewUrl = URL.createObjectURL(file);
+                setImages((prev) => [
+                    ...prev,
+                    { id, previewUrl, cloudUrl: null, status: "uploading" },
+                ]);
+                uploadToCloudinary(file)
+                    .then((cloudUrl) => {
+                        if (removedIdsRef.current.has(id)) {
+                            deleteFromCloudinary(cloudUrl);
+                        } else {
+                            setImages((prev) =>
+                                prev.map((img) =>
+                                    img.id === id
+                                        ? { ...img, cloudUrl, status: "done" }
+                                        : img,
+                                ),
+                            );
+                        }
+                    })
+                    .catch(() =>
+                        setImages((prev) =>
+                            prev.map((img) =>
+                                img.id === id
+                                    ? { ...img, status: "error" }
+                                    : img,
+                            ),
+                        ),
+                    );
+            });
+    };
 
     const handleImageSelect = (e) => {
-        const files = Array.from(e.target.files);
+        processFiles(e.target.files);
         e.target.value = "";
-        const remaining = MAX_IMAGES - images.length;
-        files.slice(0, remaining).forEach((file) => {
-            if (file.size > MAX_FILE_SIZE) {
-                alert(t("addService.errors.imageTooLarge"));
-                return;
-            }
-            const id = Math.random().toString(36).slice(2);
-            const previewUrl = URL.createObjectURL(file);
-            setImages((prev) => [
-                ...prev,
-                { id, previewUrl, cloudUrl: null, status: "uploading" },
-            ]);
-            uploadToCloudinary(file)
-                .then((cloudUrl) =>
-                    setImages((prev) =>
-                        prev.map((img) =>
-                            img.id === id
-                                ? { ...img, cloudUrl, status: "done" }
-                                : img,
-                        ),
-                    ),
-                )
-                .catch(() =>
-                    setImages((prev) =>
-                        prev.map((img) =>
-                            img.id === id ? { ...img, status: "error" } : img,
-                        ),
-                    ),
-                );
-        });
+    };
+
+    const handleDragEnter = (e) => {
+        e.preventDefault();
+        dragCountRef.current++;
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = () => {
+        dragCountRef.current--;
+        if (dragCountRef.current === 0) setIsDragging(false);
+    };
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+    };
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        dragCountRef.current = 0;
+        setIsDragging(false);
+        const files = Array.from(e.dataTransfer.files).filter((f) =>
+            f.type.startsWith("image/"),
+        );
+        if (files.length > 0) processFiles(files);
     };
 
     const retryImage = (id) => {
@@ -145,13 +230,19 @@ export function AddServiceForm() {
         fetch(img.previewUrl)
             .then((r) => r.blob())
             .then((blob) => uploadToCloudinary(new File([blob], "image")))
-            .then((cloudUrl) =>
-                setImages((prev) =>
-                    prev.map((i) =>
-                        i.id === id ? { ...i, cloudUrl, status: "done" } : i,
-                    ),
-                ),
-            )
+            .then((cloudUrl) => {
+                if (removedIdsRef.current.has(id)) {
+                    deleteFromCloudinary(cloudUrl);
+                } else {
+                    setImages((prev) =>
+                        prev.map((i) =>
+                            i.id === id
+                                ? { ...i, cloudUrl, status: "done" }
+                                : i,
+                        ),
+                    );
+                }
+            })
             .catch(() =>
                 setImages((prev) =>
                     prev.map((i) =>
@@ -162,11 +253,11 @@ export function AddServiceForm() {
     };
 
     const removeImage = (id) => {
-        setImages((prev) => {
-            const img = prev.find((i) => i.id === id);
-            if (img?.previewUrl) URL.revokeObjectURL(img.previewUrl);
-            return prev.filter((i) => i.id !== id);
-        });
+        removedIdsRef.current.add(id);
+        const img = images.find((i) => i.id === id);
+        if (img?.previewUrl) URL.revokeObjectURL(img.previewUrl);
+        if (img?.cloudUrl) deleteFromCloudinary(img.cloudUrl);
+        setImages((prev) => prev.filter((i) => i.id !== id));
     };
 
     const inputClass = (hasError) =>
@@ -210,6 +301,7 @@ export function AddServiceForm() {
             });
             const data = await res.json();
             if (res.ok && data.success) {
+                wasSubmittedRef.current = true;
                 setStatus("success");
                 setFormData(INITIAL);
                 setErrors({});
@@ -581,61 +673,103 @@ export function AddServiceForm() {
                     label={t("addService.fields.images")}
                     hint={t("addService.fields.imagesHint")}
                 >
-                    <div className="flex flex-col gap-3">
-                        {images.length > 0 && (
-                            <div className="flex flex-wrap gap-2">
-                                {images.map((img) => (
-                                    <div
-                                        key={img.id}
-                                        className="relative w-20 h-20"
-                                    >
-                                        <img
-                                            src={img.previewUrl}
-                                            alt=""
-                                            className="w-full h-full object-cover rounded-xl"
-                                        />
-                                        {img.status === "uploading" && (
-                                            <div className="absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center">
-                                                <SpinnerIcon className="w-5 h-5 text-white animate-spin" />
-                                            </div>
-                                        )}
-                                        {img.status === "error" && (
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    retryImage(img.id)
-                                                }
-                                                className="absolute inset-0 bg-brand-red/70 rounded-xl flex items-center justify-center text-white text-xs text-center px-1"
-                                            >
-                                                {t(
-                                                    "addService.errors.imageUploadFailed",
-                                                )}
-                                            </button>
-                                        )}
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={handleImageSelect}
+                        className="hidden"
+                    />
+                    {images.length === 0 ? (
+                        <div
+                            onDragEnter={handleDragEnter}
+                            onDragLeave={handleDragLeave}
+                            onDragOver={handleDragOver}
+                            onDrop={handleDrop}
+                            onClick={() => fileInputRef.current?.click()}
+                            className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center gap-2 cursor-pointer transition-colors select-none ${
+                                isDragging
+                                    ? "border-brand-blue bg-brand-blue/5 dark:bg-brand-blue/10"
+                                    : "border-stroke hover:border-brand-blue/50"
+                            }`}
+                        >
+                            <svg
+                                className="w-8 h-8 text-text/30"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={1.5}
+                                    d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
+                                />
+                            </svg>
+                            <p className="text-sm text-text/50 text-center">
+                                {t("addService.fields.imagesDrop")}
+                            </p>
+                        </div>
+                    ) : (
+                        <div
+                            className="flex flex-wrap gap-2"
+                            onDragEnter={handleDragEnter}
+                            onDragLeave={handleDragLeave}
+                            onDragOver={handleDragOver}
+                            onDrop={handleDrop}
+                        >
+                            {images.map((img) => (
+                                <div
+                                    key={img.id}
+                                    className="relative w-20 h-20"
+                                >
+                                    <img
+                                        src={img.previewUrl}
+                                        alt=""
+                                        className="w-full h-full object-cover rounded-xl"
+                                    />
+                                    {img.status === "uploading" && (
+                                        <div className="absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center">
+                                            <SpinnerIcon className="w-5 h-5 text-white animate-spin" />
+                                        </div>
+                                    )}
+                                    {img.status === "error" && (
                                         <button
                                             type="button"
-                                            onClick={() => removeImage(img.id)}
-                                            className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-white dark:bg-[#0F2040] rounded-full border border-stroke text-text flex items-center justify-center text-xs leading-none"
+                                            onClick={() => retryImage(img.id)}
+                                            className="absolute inset-0 bg-brand-red/70 rounded-xl flex items-center justify-center text-white text-xs text-center px-1"
                                         >
-                                            ×
+                                            {t(
+                                                "addService.errors.imageUploadFailed",
+                                            )}
                                         </button>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                        {images.length < MAX_IMAGES && (
-                            <label className="cursor-pointer inline-flex items-center gap-1.5 text-sm text-brand-blue hover:underline w-fit">
-                                <input
-                                    type="file"
-                                    multiple
-                                    accept="image/*"
-                                    onChange={handleImageSelect}
-                                    className="hidden"
-                                />
-                                + {t("addService.fields.imagesAdd")}
-                            </label>
-                        )}
-                    </div>
+                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={() => removeImage(img.id)}
+                                        className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-white dark:bg-[#0F2040] rounded-full border border-stroke text-text flex items-center justify-center text-xs leading-none"
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                            ))}
+                            {images.length < MAX_IMAGES && (
+                                <div
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className={`w-20 h-20 border-2 border-dashed rounded-xl flex items-center justify-center cursor-pointer transition-colors select-none ${
+                                        isDragging
+                                            ? "border-brand-blue bg-brand-blue/5 dark:bg-brand-blue/10"
+                                            : "border-stroke hover:border-brand-blue/50"
+                                    }`}
+                                >
+                                    <span className="text-2xl text-text/40 leading-none pb-0.5">
+                                        +
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </FormField>
             </div>
 
