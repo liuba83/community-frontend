@@ -1,11 +1,10 @@
 {
-  "permissions": {
-    "allow": [
-      "WebFetch(domain:forms.gle)",
-      "WebFetch(domain:docs.google.com)",
-      "mcp__figma__add_figma_file",
-      "Bash(node -e:*)",
-      "Bash(sort:*)"
-    ]
-  }
+    "permissions": {
+        "allow": [
+            "mcp__figma__add_figma_file",
+            "Bash(node -e:*)",
+            "Bash(sort:*)",
+            "WebSearch"
+        ]
+    }
 }
