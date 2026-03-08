@@ -20,6 +20,10 @@ export function Footer() {
                 <a href="/privacy" className="text-brand-blue hover:underline">
                     {t("footer.privacy")}
                 </a>
+                <span aria-hidden="true">·</span>
+                <a href="/terms" className="text-brand-blue hover:underline">
+                    {t("footer.terms")}
+                </a>
             </div>
         </footer>
     );

@@ -52,7 +52,8 @@
     "footer": {
         "copyright": "Ukrainians in Texas",
         "contact": "Contact us",
-        "privacy": "Privacy Policy"
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service"
     },
     "addService": {
         "pageTitle": "Add your service",

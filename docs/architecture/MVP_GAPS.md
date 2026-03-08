@@ -8,10 +8,10 @@ Areas to consider that may not be fully addressed in the main MVP document.
 
 | Issue | Risk | Status |
 |-------|------|--------|
-| Airtable API key exposure | `VITE_AIRTABLE_API_KEY` is visible in browser. Anyone can read data or create spam. | ✅ **RESOLVED** — Using Vercel serverless API proxy |
-| Form spam | No protection against bot submissions | ✅ **RESOLVED** — Using Google Forms (built-in reCAPTCHA) |
-| XSS vulnerabilities | User-submitted content (descriptions, URLs) could contain malicious scripts | ✅ **RESOLVED** — React default escaping (no `dangerouslySetInnerHTML`) |
-| URL validation | Malicious URLs in social/website fields | ⚠️ **PARTIAL** — Validate protocol (http/https) when rendering links |
+| Database credentials | Exposing service key in browser gives full DB access | ✅ **RESOLVED** — Service key server-side only; anon key + RLS in browser |
+| Form spam | Bot submissions filling the database | ✅ **RESOLVED** — Honeypot field + all submissions require manual admin approval |
+| XSS vulnerabilities | User-submitted content could contain malicious scripts | ✅ **RESOLVED** — React default escaping (no `dangerouslySetInnerHTML`) |
+| URL validation | Malicious URLs in social/website fields | ✅ **RESOLVED** — Protocol whitelist (http/https) enforced on submit and render |
 
 ---
 
@@ -19,42 +19,36 @@ Areas to consider that may not be fully addressed in the main MVP document.
 
 ### Footer
 
-Not documented. Typical footer includes:
-
-- Contact email for the platform
-- Privacy Policy link
-- Terms of Service link
-- Social media links
-- Copyright notice
-- "Made with love by..." (optional)
+✅ **Done** — Footer includes contact email, Privacy Policy, and Terms of Service links.
 
 ### Error & Empty States
 
-| State | When | What to show |
-|-------|------|--------------|
-| Empty search results | Search returns nothing | "No services found. Try a different search term." + suggestion to browse categories |
-| API error | Airtable is down | Friendly error message + retry button |
-| 404 page | Invalid route | Branded 404 with link back to homepage |
+| State | When | Status |
+|-------|------|--------|
+| Empty search results | Search returns nothing | ✅ Done — "No services found. Try a different search term." |
+| API error | Supabase/API is down | ✅ Done — Friendly error message + retry button |
+| 404 page | Invalid route | ✅ Done — Branded 404 with "Back to home" button |
+| Empty category | Category has no listings | ✅ Done — Message + Add service CTA |
 
 ### Loading States
 
-- Skeleton loaders for service cards during initial fetch
-- Spinner while API loads
+- ✅ Loading text shown while services fetch
+- ⚠️ Skeleton loaders not implemented (spinner/text used instead)
 
 ---
 
-## Form UX Gaps
+## Form UX
 
-> **Note:** Using Google Forms for submissions. Most form UX is handled by Google.
+Custom React form at `/add-service`. All UX handled in-app.
 
 | Consideration | Status |
 |---------------|--------|
-| Images | Handled by Google Forms (uploads to Google Drive) |
-| Description | Set max 1000 chars in Google Form settings |
-| Phone | Google Forms can validate format |
-| Duplicate detection | Manual check by admin during review |
-| Form errors | Handled by Google Forms |
-| Success state | Google Forms shows confirmation message |
+| Images | ✅ Cloudinary direct upload (up to 5 photos, 5MB each) |
+| Description | ✅ Max 600 chars, validated client + server side |
+| Phone | ✅ Validated format |
+| Duplicate detection | ⚠️ Manual check by admin during review |
+| Form errors | ✅ Inline bilingual error messages |
+| Success state | ✅ In-app confirmation with "Submit another" option |
 
 ---
 
@@ -62,33 +56,30 @@ Not documented. Typical footer includes:
 
 ### Meta Tags
 
-```html
-<title>Ukrainians in Texas — Find Ukrainian Professionals</title>
-<meta name="description" content="Directory of 100+ trusted Ukrainian professionals across Texas. Find lawyers, cleaners, handymen, and more.">
-```
+✅ Done — title and description set in `index.html`.
 
 ### Open Graph (Social Sharing)
 
-```html
-<meta property="og:title" content="Ukrainians in Texas">
-<meta property="og:description" content="Find trusted Ukrainian professionals across Texas">
-<meta property="og:image" content="/og-image.jpg">
-<meta property="og:url" content="https://example.com"> <!-- Replace with actual domain -->
-```
+✅ Done — og:title, og:description, og:url, og:image, og:type all set.
+
+⚠️ **Pending:** `public/og-image.jpg` (1200×630px) still needs to be created and added.
 
 ### Structured Data
 
-Consider adding LocalBusiness or Service schema for better Google results.
+Consider adding LocalBusiness or Service schema for better Google results. (Post-MVP)
 
 ### URL Structure
 
-Will categories have dedicated routes?
+Current routes:
+- `/` — Homepage
+- `/add-service` — Submit a listing
+- `/privacy` — Privacy Policy
+- `/terms` — Terms of Service
+- `/admin` — Admin dashboard (authenticated)
 
-- `/` — Homepage (only route for MVP)
-- `/services/cleaning` — Category page (optional, post-MVP)
-- `/services/:id` — Individual listing page (optional, post-MVP)
-
-> **Note:** No `/add` route — "Add service" links to external Google Form.
+Post-MVP (optional):
+- `/services/cleaning` — Category-specific page
+- `/services/:id` — Individual listing page
 
 ---
 
@@ -96,34 +87,27 @@ Will categories have dedicated routes?
 
 ### Deployment
 
-| Option | Pros | Cons |
-|--------|------|------|
-| Vercel | Free tier, easy React deploy, serverless functions | Vendor lock-in |
-| Netlify | Free tier, forms built-in, functions | Similar to Vercel |
-| Cloudflare Pages | Fast, free, Workers for API | Smaller ecosystem |
-
-**Recommendation:** Vercel or Netlify for simplicity.
+✅ **Resolved** — Vercel. Auto-deploys on push to `main`.
 
 ### Admin Notifications
 
-How do you know when new submissions arrive?
+How does admin know when new submissions arrive?
 
-- Airtable Automations: Send email on new record
-- Slack/Telegram integration via Airtable or Zapier
-- Daily digest email
+- ⚠️ Currently: must check `/admin` queue manually
+- Option A: Supabase webhook → email notification on new row
+- Option B: Zapier/Make trigger on new Supabase record
 
 ### Provider Edit Requests
 
 How can a provider update their listing?
 
-- Option A: Email link in footer ("Need to update your listing? Contact us")
+- Option A: Email link in footer ("Need to update your listing? Contact us") ← current approach
 - Option B: Edit link sent in confirmation email (requires unique token)
 
 ### Analytics Setup
 
-To measure success metrics, integrate:
-
-- Google Analytics 4 or Plausible (privacy-friendly)
+- ⚠️ Not yet set up
+- Recommended: Google Analytics 4 or Plausible (privacy-friendly)
 - Track: page views, search queries, category clicks, form submissions
 
 ---
@@ -132,24 +116,15 @@ To measure success metrics, integrate:
 
 ### Privacy Policy
 
-Required when collecting personal data (emails, phones). Should cover:
-
-- What data is collected
-- How it's used
-- How long it's stored
-- How to request deletion
+✅ **Done** — `/privacy` page, linked in footer. Bilingual (EN/UA).
 
 ### Terms of Service
 
-For user submissions, should cover:
-
-- Content guidelines
-- Right to remove listings
-- Disclaimer of liability
+✅ **Done** — `/terms` page, linked in footer. Bilingual (EN/UA).
 
 ### Cookie Consent
 
-If using Google Analytics or similar, may need cookie banner (especially for EU visitors).
+⚠️ Not yet implemented. Required if Google Analytics is added (EU visitors).
 
 ---
 
@@ -163,24 +138,15 @@ If using Google Analytics or similar, may need cookie banner (especially for EU 
 | Pagination | Predictable, good for SEO | Harder to browse |
 | Infinite scroll | Good UX for browsing | Harder to implement, back button issues |
 
-**Recommendation:** Start with load all; add pagination if you exceed 200 listings.
+**Current:** Load all. Add pagination if listings exceed 200.
 
 ### Image Optimization
 
-Using Google Drive for image storage. No automatic optimization.
-
-**Limitations:**
-
-- No automatic resizing or format conversion
-- Images display at original size (may be large)
-- Consider adding CSS `max-width` to prevent layout issues
-
-**Future improvement:** Migrate to Cloudinary if image performance becomes an issue.
+✅ Using Cloudinary — images are automatically optimized and served via CDN.
 
 ### Caching Strategy
 
-- Cache Airtable responses for 5 minutes (use React Query or SWR)
-- Consider `stale-while-revalidate` pattern
+✅ Supabase API responses cached for 5 min, stale-while-revalidate 10 min (via Vercel serverless response headers).
 
 ---
 
@@ -224,12 +190,17 @@ Using Google Drive for image storage. No automatic optimization.
 - [ ] Homepage loads with services
 - [ ] Search filters correctly
 - [ ] Category dropdown works (desktop + mobile)
-- [ ] "Add service" button opens Google Form
-- [ ] Images from Google Drive display correctly
-- [ ] Language switcher works
+- [ ] Add service form submits successfully
+- [ ] Images upload to Cloudinary and display correctly
+- [ ] Language switcher works (EN/UA)
 - [ ] Mobile menu opens/closes
 - [ ] All links (phone, email, website) work
 - [ ] Social icons open correct URLs
+- [ ] Admin login works at `/admin/login`
+- [ ] Admin queue shows pending submissions
+- [ ] Approve/delete actions work in admin
+- [ ] 404 page shows for unknown routes
+- [ ] Privacy Policy and Terms of Service pages load
 
 ### Automated Testing (Post-MVP)
 
@@ -243,8 +214,10 @@ Using Google Drive for image storage. No automatic optimization.
 
 | Question | Decision |
 |----------|----------|
-| Domain name | TBD — use placeholder `https://example.com` in meta tags for now |
-| Contact email | `info@spilno.us` |
-| Approval criteria | Manual review by admin based on completeness and relevance |
-| Rejection flow | Not in MVP — will consider later |
-| Featured logic | Show newest 6 approved listings (no separate "featured" flag) |
+| Domain name | `spilno.us` ✅ |
+| Contact email | `info@spilno.us` ✅ |
+| Database | Supabase (migrated from Airtable) ✅ |
+| Image hosting | Cloudinary (migrated from Google Drive) ✅ |
+| Approval criteria | Manual review by admin — all submissions start as `approved = false` ✅ |
+| Rejection flow | Not in MVP — listings are silently not approved or deleted |
+| Featured logic | Newest 6 approved listings shown in "Featured" section ✅ |
