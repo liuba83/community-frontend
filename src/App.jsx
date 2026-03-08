@@ -5,6 +5,8 @@ import { ThemeProvider } from './context/ThemeContext';
 import { HomePage } from './pages/HomePage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { AddServicePage } from './pages/AddServicePage';
+import { NotFoundPage } from './pages/NotFoundPage';
+import { TermsPage } from './pages/TermsPage';
 import { BackToTop } from './components/UI/BackToTop';
 
 const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage').then((m) => ({ default: m.AdminLoginPage })));
@@ -21,11 +23,13 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/add-service" element={<AddServicePage />} />
+            <Route path="/terms" element={<TermsPage />} />
             <Route path="/admin/login" element={<Suspense><AdminLoginPage /></Suspense>} />
             <Route path="/admin" element={<Suspense><AdminLayout /></Suspense>}>
               <Route index element={<AdminQueuePage />} />
               <Route path="services" element={<AdminServicesPage />} />
             </Route>
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
           <BackToTop />
         </LanguageProvider>

@@ -6,48 +6,47 @@ Key architectural and technical decisions for the Ukrainians in Texas service di
 
 ## Decision 1: Database — Airtable vs Alternatives
 
-**Decision:** Use **Airtable**
-**Date:** 2026-02-15
+**Decision:** ~~Airtable~~ → **Supabase** (migrated 2026-03-08)
+**Date:** 2026-02-15 (original) / 2026-03-08 (migration)
 **Status:** ✅ Accepted
 
 ### Alternatives Considered
 
 | Option | Pros | Cons | Complexity |
 | -------- | ------ | ------ | ------------ |
-| **Airtable** | Spreadsheet-like UI, visual, perfect for manual approval, no SQL needed, 1,200 records free | Need Vercel proxy for security, paid tier after 1,200 records ($20/month) | ⭐⭐⭐⭐⭐ Very Simple |
-| **Supabase** | Better free tier (unlimited records), built-in Row Level Security, PostgreSQL, real-time updates | No spreadsheet UI, requires basic SQL knowledge, more complex for non-technical admin | ⭐⭐⭐ Medium |
+| **Airtable** | Spreadsheet-like UI, visual, perfect for manual approval, no SQL needed, 1,200 records free | Need Vercel proxy for security, paid tier after 1,200 records ($20/month), no built-in auth | ⭐⭐⭐⭐⭐ Very Simple |
+| **Supabase** | Better free tier (unlimited records), built-in Row Level Security, PostgreSQL, built-in auth | No spreadsheet UI, requires basic SQL knowledge | ⭐⭐⭐ Medium |
 | **Firebase/Firestore** | Google product, generous free tier, real-time, NoSQL | Firebase console is complex, security rules tricky, pricing scales up | ⭐⭐⭐ Medium |
 | **Google Sheets** | Extremely simple, free forever, everyone knows it | NOT designed for production, slow API, security issues, no proper database features | ⭐⭐⭐⭐⭐ Very Simple (but not production-ready) |
 
-### Why Airtable?
+### Why Supabase?
 
-1. **Perfect for manual admin workflow**
-   - Spreadsheet-like interface is ideal for reviewing and approving submissions
-   - Visual grid view lets you see all pending listings at a glance
-   - Simple approval process: just check a box
+Started with Airtable for simplicity, but migrated to Supabase when we decided to build a custom admin dashboard with authentication.
 
-2. **No technical skills required**
-   - Admin doesn't need to know SQL or database concepts
-   - Anyone can use it immediately
+1. **Built-in Auth**
+   - Supabase Auth (email + password) powers the admin login
+   - No need for a separate auth service
+   - Session management handled automatically
 
-3. **Generous free tier for MVP**
-   - 1,200 records is plenty (that's 1,200 Ukrainian businesses in Texas)
-   - Won't hit this limit for a long time
-   - If we do grow past 1,200, $20/month is totally reasonable
+2. **Row Level Security (RLS)**
+   - Public users can only read approved listings (enforced at DB level)
+   - Authenticated admin gets full access — no extra serverless functions needed
+   - Admin can call Supabase directly from the browser using the anon (publishable) key
 
-4. **Cost vs complexity tradeoff**
-   - Supabase is free for unlimited records, but requires SQL knowledge and has less friendly admin UI
-   - For a simple service directory with manual approval, ease of use > cost savings
+3. **Better free tier**
+   - Unlimited records (Airtable caps at 1,200 on free tier)
+   - Built-in database, auth, and storage in one service
 
-5. **Already architected for it**
-   - Security handled via Vercel serverless proxy
-   - Google Forms → Google Sheets → Airtable workflow is straightforward
+4. **Standard PostgreSQL**
+   - Familiar SQL for querying and migrations
+   - Schema defined in `supabase/schema.sql`
 
-### When to Reconsider
+### Why Not Airtable (original choice)?
 
-- If we hit 1,200 records and don't want to pay $20/month → migrate to Supabase
-- If we need real-time updates without polling → Supabase
-- If we add user authentication → Supabase has built-in auth
+Airtable worked well for MVP but lacked:
+- Built-in authentication (needed for admin dashboard)
+- Row-level security (hard to enforce access control)
+- Free tier was capped at 1,200 records
 
 ---
 
@@ -75,7 +74,6 @@ Key architectural and technical decisions for the Ukrainians in Texas service di
 2. **Serverless functions integrated**
    - `/api` folder automatically becomes serverless functions
    - No extra configuration needed
-   - Perfect for our Airtable proxy pattern
 
 3. **Developer experience**
    - Deploy previews for every PR
@@ -93,23 +91,9 @@ Key architectural and technical decisions for the Ukrainians in Texas service di
    - Environment variables in one place
    - Simplified deployment
 
-### Why Not Netlify?
-
-- Very similar to Vercel
-- Would work just as well
-- Chose Vercel for slightly better React/Vite integration
-
-### Why Not Cloudflare Pages?
-
-- Cloudflare Workers use a different runtime (not standard Node.js)
-- Would require adapting our Airtable API code
-- Smaller ecosystem for React apps
-- Better suited for edge computing use cases
-
 ### When to Reconsider
 
 - If Vercel pricing becomes too expensive at scale → Cloudflare Pages
-- If we need specific Netlify features (built-in forms) → but we're using Google Forms anyway
 - If vendor lock-in becomes a concern → self-host on VPS
 
 ---
@@ -125,128 +109,70 @@ Key architectural and technical decisions for the Ukrainians in Texas service di
 | Option | Pros | Cons | Cost |
 |--------|------|------|------|
 | **Google Drive** | Free, integrates with Google Forms, unlimited storage (15GB free), simple for users | No automatic optimization, manual URL conversion needed, not designed for web hosting | Free (15GB) |
-| **Cloudinary** | Automatic optimization, image transformations, CDN, purpose-built for images | More complex setup, free tier limited (25 credits/month), overkill for MVP | Free tier limited |
-| **Vercel Blob** | Integrated with Vercel, simple API, good DX | Paid only ($0.15/GB storage + $0.30/GB bandwidth), need custom upload form | Paid ($0.15/GB) |
+| **Cloudinary** | Automatic optimization, image transformations, CDN, purpose-built for images | Free tier limited (25 credits/month) | Free tier limited |
+| **Vercel Blob** | Integrated with Vercel, simple API, good DX | Paid only ($0.15/GB storage + $0.30/GB bandwidth) | Paid ($0.15/GB) |
 | **AWS S3** | Cheap, scalable, industry standard | Complex setup, need to configure CloudFront CDN, overkill for MVP | Very cheap but complex |
-| **imgbb / Imgur** | Simple, free, purpose-built for images | Rate limits, less reliable, not professional, terms of service restrictions | Free |
 
-### Why Google Drive?
+### Why Cloudinary?
 
-1. **Zero infrastructure**
-   - No image hosting service to set up or manage
-   - No API keys to manage (for image uploads)
-   - No custom upload form needed
+1. **Purpose-built for images**
+   - Automatic optimization (WebP/AVIF delivery)
+   - Resizing and transformation on the fly
+   - Global CDN for fast delivery
 
-2. **Integrated with Google Forms**
-   - Users upload images directly through Google Form
-   - Files automatically saved to Google Drive
-   - No backend code needed for file uploads
+2. **Direct upload from browser**
+   - Users upload images via unsigned upload preset in the Add Service form
+   - No backend code needed for uploads
+   - Cloudinary URLs stored in Supabase (comma-separated in `images` field)
 
-3. **Free and unlimited (effectively)**
-   - 15GB free storage (thousands of images)
-   - If we hit limit, $1.99/month for 100GB
-   - Images don't count against Airtable storage
-
-4. **Simple for users**
-   - Users already understand file uploads in Google Forms
-   - No special image upload interface needed
-
-5. **Good enough for MVP**
-   - Yes, images won't be optimized
-   - Yes, we need to convert share URLs to direct links
-   - But it's simple and works
-
-### Tradeoffs We Accept
-
-**No automatic optimization:**
-
-- Images will be full size (potentially large)
-- Solution: Use CSS `max-width` to prevent layout issues
-- Solution: Ask users to upload reasonably-sized images in Google Form instructions
-
-**Manual URL conversion needed:**
-
-- Google Drive share URLs don't work directly in `<img>` tags
-- Admin needs to convert: `https://drive.google.com/file/d/FILE_ID/view` → `https://drive.google.com/uc?export=view&id=FILE_ID`
-- We can provide a simple script for this if needed
-
-**Not blazing fast:**
-
-- Google Drive CDN is decent but not optimized for web images
-- For MVP, this is acceptable
-- Users won't notice unless site gets huge traffic
+3. **Free tier sufficient for MVP**
+   - 25 credits/month covers typical usage
+   - No infrastructure to manage
 
 ### When to Reconsider
 
-**Migrate to Cloudinary if:**
-
-- Image load times become a problem
-- We need automatic resizing/optimization
-- We want to serve WebP/AVIF formats
-- We exceed 15GB (unlikely for MVP)
-
-**Migrate to Vercel Blob if:**
-
-- We build a custom "Add Service" form (not using Google Forms)
-- We want tighter integration with our stack
-- Cost ($0.15/GB storage) is acceptable
-
-**For now: Google Drive is perfect for MVP.**
+- If we exceed free tier limits → upgrade Cloudinary plan or migrate to Vercel Blob
+- If cost becomes a concern → AWS S3 + CloudFront
 
 ---
 
 ## Decision 4: Forms — Google Forms vs Custom Form
 
-**Decision:** Use **Google Forms**
-**Date:** 2026-02-15
+**Decision:** ~~Google Forms~~ → **Custom React Form** (migrated 2026-03-01)
+**Date:** 2026-02-15 (original) / 2026-03-01 (migration)
 **Status:** ✅ Accepted
 
-### Why Google Forms?
+### Alternatives Considered
 
-1. **Built-in spam protection**
-   - reCAPTCHA automatically enabled
-   - Google's rate limiting and abuse detection
-   - No custom spam protection code needed
+| Option | Pros | Cons |
+|--------|------|------|
+| **Google Forms** | Zero infrastructure, built-in spam protection, free, no code needed | No custom branding, separate from site, manual data import to database |
+| **Custom React Form** | Matches site design, submits directly to Supabase, better UX, image upload built-in | Requires spam protection, more code to maintain |
 
-2. **Zero infrastructure**
-   - No backend form submission code
-   - No file upload handling
-   - No form validation code
+### Why Custom Form?
 
-3. **Easy to modify**
-   - Can add/remove fields without code changes
-   - Can update validation rules in Google Forms UI
-   - Non-technical admin can manage form
+1. **Integrated experience**
+   - Form lives at `/add-service` within the site
+   - Matches the site's design and language (English/Ukrainian)
+   - No redirect to an external Google Form
 
-4. **Free and reliable**
-   - Google's infrastructure
-   - 99.9% uptime
-   - Handles any traffic spike
+2. **Direct Supabase integration**
+   - Submissions go directly to the `services` table (`approved = false`)
+   - No manual import step — admin sees pending submissions immediately in the dashboard queue
 
-### Tradeoffs
+3. **Built-in image upload**
+   - Users upload photos directly via Cloudinary unsigned preset
+   - Images attached to the submission automatically
 
-**Manual admin workflow:**
+4. **Custom validation**
+   - Ukrainian phone formats, URL validation, required fields
+   - Bilingual error messages
 
-- Admin copies data from Google Sheets to Airtable
-- ~2-5 minutes per submission
-- If volume exceeds 10/week, can automate with Zapier/Make
+### Spam protection
 
-**No custom branding:**
-
-- Form opens in Google Forms (external site)
-- Can't match our site design exactly
-- Acceptable for MVP — users understand and trust Google Forms
-
-### When to Reconsider
-
-**Build custom form if:**
-
-- Submission volume is high (>10/week) and manual import is tedious
-- We want submissions to go directly to Airtable (eliminate Google Sheets step)
-- Branding is critical and we need form to match our design
-- We add user accounts and want submissions tied to authenticated users
-
-**For MVP: Google Forms is the right choice.**
+Custom form includes:
+- Honeypot field (bots fill it, humans don't)
+- Manual review: all submissions start as `approved = false` and require admin approval
 
 ---
 
@@ -259,9 +185,10 @@ Key architectural and technical decisions for the Ukrainians in Texas service di
 ### Structure
 
 ```
-ukrainians-in-texas/
+community-frontend/
 ├── api/              # Vercel serverless functions (server-side)
 ├── src/              # React frontend (client-side)
+├── supabase/         # SQL schema and RLS policies
 ├── docs/             # Documentation
 ├── public/           # Static assets
 └── package.json
@@ -287,26 +214,16 @@ ukrainians-in-texas/
    - API and frontend on same domain
    - `/api/services` is relative path
 
-### When to Reconsider
-
-**Split into separate repos if:**
-
-- Different teams work on frontend vs backend
-- Backend serves multiple frontends
-- Different deployment schedules needed
-
-**For this simple MVP: Monorepo is perfect.**
-
 ---
 
 ## Summary
 
 | Decision | Choice | Why |
 |----------|--------|-----|
-| **Database** | Airtable | Visual UI perfect for manual admin approval |
+| **Database** | Supabase | Built-in auth + RLS, needed for admin dashboard |
 | **Hosting** | Vercel | Best DX for React + serverless functions |
-| **Images** | Google Drive | Free, integrates with Google Forms, zero setup |
-| **Forms** | Google Forms | Built-in spam protection, zero infrastructure |
+| **Images** | Cloudinary | Optimized delivery, direct upload from browser |
+| **Forms** | Custom React form | Integrated UX, direct Supabase submission |
 | **Repo Structure** | Monorepo | Simple, standard Vercel pattern |
 
 **Philosophy:** For MVP, prioritize **simplicity and speed** over **optimization and scale**. We can always migrate later if needed.

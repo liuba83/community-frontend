@@ -16,21 +16,21 @@ Assumptions, conflicts, and open questions tracked during MVP implementation.
 
 ## Assumptions
 
-1. **Single-page app** — MVP is a single homepage route (`/`). No routing library needed.
-2. **Google Form URL** — Using `VITE_GOOGLE_FORM_URL` env var; placeholder until actual form is created.
+1. **Routing** — Uses React Router 7. Main public routes: `/`, `/add-service`, `/privacy`. Admin routes: `/admin/login`, `/admin`, `/admin/services`.
+2. **Add Service form** — Custom React form at `/add-service`. Submits directly to Supabase via `/api/submit-service`. No Google Forms.
 3. **Featured listings** — Showing newest 6 approved listings (no separate "featured" flag per MVP doc).
 4. **Client-side filtering** — All approved services loaded at once; search/filter happens in browser (per MVP_GAPS.md recommendation for <200 listings).
-5. **No footer in MVP** — MVP_GAPS.md notes footer is missing from spec. Will add a minimal footer.
-6. **Image fallback** — Google Drive images may fail to load; will show placeholder on error.
+5. **Footer** — Minimal footer added.
+6. **Image handling** — Images uploaded to Cloudinary via unsigned preset; URLs stored in Supabase `images` field (comma-separated). Fallback placeholder shown on load error.
 
 ---
 
 ## Open Questions
 
-1. **Google Form URL** — Actual form URL not yet created. Using placeholder.
-2. **Domain name** — TBD. Using placeholder in meta tags.
-3. **Contact email** — `info@spilno.us`
-4. **Airtable credentials** — Not yet provided. API proxy will work once env vars are set.
+1. **Domain name** — `spilno.us` ✅ resolved
+2. **Contact email** — `info@spilno.us` ✅ resolved
+3. **Database** — Supabase ✅ resolved (migrated from Airtable 2026-03-08)
+4. **Image hosting** — Cloudinary ✅ resolved (migrated from Google Drive)
 
 ---
 
