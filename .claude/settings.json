@@ -1,10 +1,11 @@
 {
-    "permissions": {
-        "allow": [
-            "mcp__figma__add_figma_file",
-            "Bash(node -e:*)",
-            "Bash(sort:*)",
-            "WebSearch"
-        ]
-    }
+  "permissions": {
+    "allow": [
+      "mcp__figma__add_figma_file",
+      "Bash(node -e:*)",
+      "Bash(sort:*)",
+      "WebSearch",
+      "Bash(git remote get-url origin)"
+    ]
+  }
 }
