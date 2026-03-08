@@ -7,7 +7,7 @@ Ukrainian professional services directory web app for the Texas community. Bilin
 - **React** 19 + **Vite** 7 + **Tailwind CSS** v4
 - **React Router** 7 for client-side routing
 - **Vercel** for deployment (frontend + serverless API functions)
-- **Airtable** as database/CMS (accessed via Vercel serverless functions)
+- **Supabase** (Postgres) as database (accessed via Vercel serverless functions)
 - No Redux/Zustand — React Context API only
 
 ## Package Manager
@@ -31,11 +31,11 @@ src/
   utils/            # validation.js, imageUrl.js
   data/             # categories.js (22 categories, 200+ subcategories)
   i18n/             # en.json, ua.json — manual JSON translations
-api/                # Vercel serverless functions (proxy to Airtable)
+api/                # Vercel serverless functions
   services.js       # GET — fetch approved services
   submit-service.js # POST — submit new service listing
-  delete-image.js   # DELETE — remove an image from a listing
-  _lib/airtable.js
+  delete-image.js   # DELETE — remove an image from Cloudinary
+  _lib/supabase.js  # Supabase client + fetchApprovedServices
 ```
 
 ## Key Conventions
@@ -57,23 +57,28 @@ api/                # Vercel serverless functions (proxy to Airtable)
 - Translations in `src/i18n/en.json` and `src/i18n/ua.json`
 
 ## API
-- Client never talks to Airtable directly — always via `/api/services` (Vercel serverless)
-- During local dev, Vite middleware in `vite.config.js` serves `/api/services` locally
+- Client never calls Supabase directly — always via `/api/services` (Vercel serverless)
+- During local dev, Vite middleware in `vite.config.js` serves `/api/*` locally
 - Cache headers: 5 min, stale-while-revalidate 10 min
+- Supabase table: `services` — RLS enabled, public can only read `approved = true` rows
 
 ## Environment Variables
 Client-side (prefix `VITE_`):
 
 - `VITE_CONTACT_EMAIL`
-- `VITE_API_BASE_URL`
+- `VITE_CLOUDINARY_CLOUD_NAME`
+- `VITE_CLOUDINARY_UPLOAD_PRESET`
 
 Server-side (Vercel only, never in client):
-- `AIRTABLE_API_KEY`
-- `AIRTABLE_BASE_ID`
-- `AIRTABLE_TABLE_NAME`
+
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_KEY`
+- `CLOUDINARY_CLOUD_NAME`
+- `CLOUDINARY_API_KEY`
+- `CLOUDINARY_API_SECRET`
 
 ## Images
-- Stored in Google Drive, URLs in Airtable
+- Uploaded to Cloudinary via unsigned upload preset; URLs stored in Supabase `images` field (comma-separated)
 - Parsed and validated in `src/utils/imageUrl.js` and `src/utils/validation.js`
 - Gallery with Lightbox component for full-size viewing
 
