@@ -8,7 +8,7 @@ import {
     GlobeIcon,
     ChevronDownIcon,
 } from "../UI/Icon";
-import { getSafeHref, getDomain } from "../../utils/validation";
+import { getSafeHref, getDomain, formatPhone } from "../../utils/validation";
 import { parseImageUrls } from "../../utils/imageUrl";
 import { useLanguage } from "../../hooks/useLanguage";
 
@@ -81,8 +81,8 @@ export function ServiceCard({ service, onSubcategoryClick }) {
                             href={`tel:${service.phone}`}
                             className="text-base text-brand-blue dark:text-[#60A5FA] underline"
                         >
-                            {service.phone}
-                        </a>
+                            {formatPhone(service.phone)}
+</a>
                     </div>
                 )}
                 {service.email && (
