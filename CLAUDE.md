@@ -17,7 +17,12 @@ Ukrainian professional services directory web app for the Texas community. Bilin
 ```
 src/
   components/       # UI components (PascalCase folders)
-    UI/             # Reusable primitives (Button, Icon, Tag)
+    UI/             # Reusable primitives (Button, Icon, Tag, BackToTop)
+    Header/         # Header, Logo, CategoryMenu, LanguageSelector, ThemeToggle, MobileMenu
+    Hero/           # Hero, SearchBar
+    ServiceCard/    # ServiceCard, ImageGallery, SocialLinks
+    ServiceList/    # ServiceList
+    Footer/         # Footer
     AddServiceForm/ # Form for submitting a new service listing
   pages/            # Page-level components (HomePage, PrivacyPage, AddServicePage)
   context/          # ThemeContext, LanguageContext
@@ -29,6 +34,7 @@ src/
 api/                # Vercel serverless functions (proxy to Airtable)
   services.js       # GET — fetch approved services
   submit-service.js # POST — submit new service listing
+  delete-image.js   # DELETE — remove an image from a listing
   _lib/airtable.js
 ```
 

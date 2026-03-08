@@ -1,4 +1,4 @@
-import { fetchApprovedServices } from './_lib/airtable.js';
+import { fetchApprovedServices } from './_lib/supabase.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {

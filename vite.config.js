@@ -2,7 +2,7 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import { fetchApprovedServices } from './api/_lib/airtable.js'
+import { fetchApprovedServices, getSupabaseAdmin } from './api/_lib/supabase.js'
 
 function localApiPlugin() {
   return {
@@ -31,38 +31,25 @@ function localApiPlugin() {
             res.statusCode = 400; res.end(JSON.stringify({ error: 'Missing required fields' })); return
           }
 
-          const { AIRTABLE_API_KEY, AIRTABLE_BASE_ID } = process.env
-          const AIRTABLE_TABLE_NAME = process.env.AIRTABLE_TABLE_NAME || 'Services'
-
-          if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) {
-            res.statusCode = 500; res.end(JSON.stringify({ error: 'Server configuration error' })); return
-          }
-
-          const fields = {
+          const record = {
             title: businessName.trim(), description_en: descriptionEn.trim(),
             description_ua: descriptionUa.trim(), category,
             phone: phone.trim(), email: email.trim(), approved: false,
           }
-          if (address?.trim()) fields.address = address.trim()
-          if (website?.trim()) fields.website = website.trim()
-          if (instagram?.trim()) fields.instagram = instagram.trim()
-          if (facebook?.trim()) fields.facebook = facebook.trim()
-          if (linkedin?.trim()) fields.linkedin = linkedin.trim()
+          if (address?.trim()) record.address = address.trim()
+          if (website?.trim()) record.website = website.trim()
+          if (instagram?.trim()) record.instagram = instagram.trim()
+          if (facebook?.trim()) record.facebook = facebook.trim()
+          if (linkedin?.trim()) record.linkedin = linkedin.trim()
 
           const validImageUrls = Array.isArray(imageUrls)
             ? imageUrls.filter((u) => typeof u === 'string' && u.startsWith('https://res.cloudinary.com/')).slice(0, 5)
             : []
-          if (validImageUrls.length > 0) fields.images = validImageUrls.join(',')
+          if (validImageUrls.length > 0) record.images = validImageUrls.join(',')
 
-          const atRes = await fetch(
-            `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_TABLE_NAME)}`,
-            { method: 'POST', headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ fields }) }
-          )
-
-          if (!atRes.ok) {
-            console.error('Airtable error:', await atRes.text())
-            res.statusCode = 500; res.end(JSON.stringify({ error: 'Failed to submit' })); return
-          }
+          const supabase = getSupabaseAdmin()
+          const { error: sbError } = await supabase.from('services').insert(record)
+          if (sbError) throw sbError
 
           res.statusCode = 200
           res.end(JSON.stringify({ success: true }))
@@ -150,10 +137,9 @@ function localApiPlugin() {
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
 
-  // Make server-only Airtable variables available to local API middleware.
-  process.env.AIRTABLE_API_KEY ||= env.AIRTABLE_API_KEY
-  process.env.AIRTABLE_BASE_ID ||= env.AIRTABLE_BASE_ID
-  process.env.AIRTABLE_TABLE_NAME ||= env.AIRTABLE_TABLE_NAME
+  // Make server-only variables available to local API middleware.
+  process.env.SUPABASE_URL ||= env.SUPABASE_URL
+  process.env.SUPABASE_SERVICE_KEY ||= env.SUPABASE_SERVICE_KEY
   process.env.CLOUDINARY_CLOUD_NAME ||= env.CLOUDINARY_CLOUD_NAME
   process.env.CLOUDINARY_API_KEY ||= env.CLOUDINARY_API_KEY
   process.env.CLOUDINARY_API_SECRET ||= env.CLOUDINARY_API_SECRET
