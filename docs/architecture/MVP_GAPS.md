@@ -33,7 +33,7 @@ Areas to consider that may not be fully addressed in the main MVP document.
 ### Loading States
 
 - ✅ Loading text shown while services fetch
-- ⚠️ Skeleton loaders not implemented (spinner/text used instead)
+- ✅ Skeleton loaders implemented — 6 `animate-pulse` placeholder cards render in `ServiceList` while data loads
 
 ---
 

@@ -910,7 +910,7 @@ AIRTABLE_TABLE_NAME=Services
 - Category filtering
 - Custom "Add service" form at `/add-service` with Cloudinary image upload
 - Supabase integration via Vercel API proxy (public) + anon key + RLS (admin)
-- Language switcher (UI only: EN/UA)
+- Language switcher (EN/UA) — UI strings and listing descriptions (description_en / description_ua) both translated
 - Mobile-responsive (mobile-first)
 - Social links (open in new tab with `rel="noopener noreferrer"`)
 - Contact links (tel:, mailto:, website)
@@ -918,6 +918,7 @@ AIRTABLE_TABLE_NAME=Services
 - **Security: XSS prevention** (React default escaping)
 - **Security: URL validation** (http/https whitelist)
 - Empty states (no results, no category listings, API error)
+- Skeleton loaders for service cards (6 animated `animate-pulse` placeholder cards while data loads)
 - 404 page
 - Privacy Policy page (`/privacy`)
 - Terms of Service page (`/terms`)
@@ -933,11 +934,10 @@ AIRTABLE_TABLE_NAME=Services
 - In-app messaging
 - Paid/premium listings
 - Reviews/ratings
-- Multi-language content (only UI is translated, not listing descriptions)
 - Analytics (Google Analytics / Plausible not yet set up)
 - Cookie consent banner
 - Admin email notifications on new submissions
-- Skeleton loaders (text loading state used instead)
+- Individual listing pages (`/services/:id`)
 
 ---
 
