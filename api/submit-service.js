@@ -1,3 +1,5 @@
+import { getSupabaseAdmin } from './_lib/supabase.js';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -29,15 +31,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
-  const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
-  const AIRTABLE_TABLE_NAME = process.env.AIRTABLE_TABLE_NAME || 'Services';
-
-  if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) {
-    return res.status(500).json({ error: 'Server configuration error' });
-  }
-
-  const fields = {
+  const record = {
     title: businessName.trim(),
     description_en: descriptionEn.trim(),
     description_ua: descriptionUa.trim(),
@@ -47,38 +41,23 @@ export default async function handler(req, res) {
     approved: false,
   };
 
-  if (address?.trim()) fields.address = address.trim();
-  if (website?.trim()) fields.website = website.trim();
-  if (instagram?.trim()) fields.instagram = instagram.trim();
-  if (facebook?.trim()) fields.facebook = facebook.trim();
-  if (linkedin?.trim()) fields.linkedin = linkedin.trim();
+  if (address?.trim()) record.address = address.trim();
+  if (website?.trim()) record.website = website.trim();
+  if (instagram?.trim()) record.instagram = instagram.trim();
+  if (facebook?.trim()) record.facebook = facebook.trim();
+  if (linkedin?.trim()) record.linkedin = linkedin.trim();
 
   const validImageUrls = Array.isArray(imageUrls)
     ? imageUrls
         .filter((u) => typeof u === 'string' && u.startsWith('https://res.cloudinary.com/'))
         .slice(0, 5)
     : [];
-  if (validImageUrls.length > 0) fields.images = validImageUrls.join(',');
+  if (validImageUrls.length > 0) record.images = validImageUrls.join(',');
 
   try {
-    const response = await fetch(
-      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_TABLE_NAME)}`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${AIRTABLE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ fields }),
-      }
-    );
-
-    if (!response.ok) {
-      const err = await response.text();
-      console.error('Airtable error:', err);
-      return res.status(500).json({ error: 'Failed to submit' });
-    }
-
+    const supabase = getSupabaseAdmin();
+    const { error } = await supabase.from('services').insert(record);
+    if (error) throw error;
     return res.status(200).json({ success: true });
   } catch (error) {
     console.error('Submit error:', error);
