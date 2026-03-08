@@ -24,9 +24,11 @@ src/
     ServiceList/    # ServiceList
     Footer/         # Footer
     AddServiceForm/ # Form for submitting a new service listing
-  pages/            # Page-level components (HomePage, PrivacyPage, AddServicePage)
+  pages/            # Page-level components (HomePage, PrivacyPage, AddServicePage, TermsPage, NotFoundPage)
+    admin/          # AdminLoginPage, AdminLayout, AdminQueuePage, AdminServicesPage
   context/          # ThemeContext, LanguageContext
   hooks/            # useTheme, useLanguage, useServices
+  lib/              # supabaseClient.js — browser-side Supabase client (anon key)
   services/         # api.js — fetch functions
   utils/            # validation.js, imageUrl.js
   data/             # categories.js (22 categories, 200+ subcategories)
@@ -36,6 +38,9 @@ api/                # Vercel serverless functions
   submit-service.js # POST — submit new service listing
   delete-image.js   # DELETE — remove an image from Cloudinary
   _lib/supabase.js  # Supabase client + fetchApprovedServices
+supabase/
+  schema.sql        # Table definition + public read RLS policy
+  admin-rls.sql     # Admin full-access RLS policy (run once in SQL Editor)
 ```
 
 ## Key Conventions
@@ -57,10 +62,11 @@ api/                # Vercel serverless functions
 - Translations in `src/i18n/en.json` and `src/i18n/ua.json`
 
 ## API
-- Client never calls Supabase directly — always via `/api/services` (Vercel serverless)
+- Public app never calls Supabase directly — always via `/api/services` (Vercel serverless)
+- Admin dashboard calls Supabase directly from the browser using the anon key + RLS policies
 - During local dev, Vite middleware in `vite.config.js` serves `/api/*` locally
 - Cache headers: 5 min, stale-while-revalidate 10 min
-- Supabase table: `services` — RLS enabled, public can only read `approved = true` rows
+- Supabase table: `services` — RLS enabled, public can only read `approved = true` rows; authenticated users have full access
 
 ## Environment Variables
 Client-side (prefix `VITE_`):
@@ -68,6 +74,8 @@ Client-side (prefix `VITE_`):
 - `VITE_CONTACT_EMAIL`
 - `VITE_CLOUDINARY_CLOUD_NAME`
 - `VITE_CLOUDINARY_UPLOAD_PRESET`
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
 
 Server-side (Vercel only, never in client):
 

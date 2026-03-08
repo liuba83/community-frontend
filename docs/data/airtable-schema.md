@@ -1,26 +1,36 @@
-# Airtable Schema
+# Database Schema
 
-Table: `services` (id: `tbl3gTC6DaAvprtDB`)
+Supabase (PostgreSQL) — table: `services`
 
-| Field Name      | Type              | ID                   | Notes |
-|----------------|-------------------|----------------------|-------|
-| title          | singleLineText    | fldIy5mC6wBsGl9Dh   | Primary field |
-| description_en | multilineText     | fldZNGSUzVpfbMWtz   | |
-| description_ua | multilineText     | fld938irTINzP13ij   | |
-| category       | multilineText     | fldKqfr8VztHuaq8f   | |
-| address        | multilineText     | fldauRpcheMCKgHa9   | |
-| phone          | phoneNumber       | fldc79rALL6uMKvNb   | |
-| email          | email             | fldyId7xwal2cKw4o   | |
-| website        | url               | fldH3Vb0OZBFiNBj4   | |
-| approved       | checkbox          | fldHmCbdcVCpo2AP0   | |
-| featured       | checkbox          | fld0qmtkoMCqPt7sT   | |
-| submittedAt    | createdTime       | fldO63zVCPQCqgaO5   | dateTime, local format, 12h |
-| images         | multilineText     | fldqcmyvkGQwaJ4Fn   | Google Drive URLs |
-| instagram      | url               | fldwJyGzK094tI37o   | |
-| facebook       | url               | fldcBEUx8rtMdSQNb   | |
-| linkedin       | url               | fldP3EqVz1aHqdPT5   | |
-| messenger      | url               | fldabhc0rPmlshMDi   | |
-| notes          | multilineText     | fldwi5PwJRRCsH6tX   | |
+> Previously: Airtable (migrated to Supabase 2026-03-08)
 
-## Views
-- Grid view (`viwPiVry7QH4onVtE`)
+| Column | Type | Default | Notes |
+|--------|------|---------|-------|
+| id | uuid | gen_random_uuid() | Primary key |
+| title | text | — | Business name (required) |
+| description_en | text | — | Description in English |
+| description_ua | text | — | Description in Ukrainian |
+| category | text | — | Category slug |
+| address | text | — | |
+| phone | text | — | |
+| email | text | — | |
+| website | text | — | URL |
+| instagram | text | — | URL |
+| facebook | text | — | URL |
+| linkedin | text | — | URL |
+| messenger | text | — | URL |
+| images | text | — | Comma-separated Cloudinary URLs |
+| approved | boolean | false | RLS: public reads only `approved = true` rows |
+| featured | boolean | false | |
+| notes | text | — | Internal admin notes (not shown publicly) |
+| submitted_at | timestamptz | now() | Set on insert |
+| created_at | timestamptz | now() | Set on insert |
+
+## Row Level Security (RLS)
+
+- **Public (anon key):** `SELECT` only where `approved = true`
+- **Authenticated (admin):** full access — SELECT, INSERT, UPDATE, DELETE
+
+SQL files in `supabase/`:
+- `schema.sql` — table definition + public read policy
+- `admin-rls.sql` — admin full-access policy (run once in Supabase SQL Editor)
