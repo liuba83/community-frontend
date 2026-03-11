@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 ## Project Overview
-Ukrainian professional services directory web app for the Texas community. Bilingual (English/Ukrainian), with light/dark theme support.
+Spilno.us — Ukrainian professional services directory web app for the Texas community. Bilingual (English/Ukrainian), with light/dark theme support.
 
 ## Tech Stack
 - **React** 19 + **Vite** 7 + **Tailwind CSS** v4
@@ -31,7 +31,7 @@ src/
   lib/              # supabaseClient.js — browser-side Supabase client (anon key)
   services/         # api.js — fetch functions
   utils/            # validation.js, imageUrl.js
-  data/             # categories.js (22 categories, 200+ subcategories)
+  data/             # categories.js (21 categories, 105 subcategories)
   i18n/             # en.json, ua.json — manual JSON translations
 api/                # Vercel serverless functions
   services.js       # GET — fetch approved services
