@@ -15,7 +15,45 @@ function EditPanel({ service, onClose, onSave }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    const handleKeyDown = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+  const [draggingIdx, setDraggingIdx] = useState(null);
+  const [dragOverIdx, setDragOverIdx] = useState(null);
+
   const set = (field, value) => setForm((f) => ({ ...f, [field]: value }));
+  const imageUrls = form.images ? form.images.split(',').map((u) => u.trim()).filter(Boolean) : [];
+
+  const handleImageDragStart = (e, idx) => {
+    e.dataTransfer.effectAllowed = 'move';
+    setDraggingIdx(idx);
+  };
+
+  const handleImageDragOver = (e, idx) => {
+    e.preventDefault();
+    if (idx !== draggingIdx) setDragOverIdx(idx);
+  };
+
+  const handleImageDrop = (e, targetIdx) => {
+    e.preventDefault();
+    if (draggingIdx === null || draggingIdx === targetIdx) {
+      setDraggingIdx(null);
+      setDragOverIdx(null);
+      return;
+    }
+    const next = [...imageUrls];
+    next.splice(targetIdx, 0, next.splice(draggingIdx, 1)[0]);
+    set('images', next.join(', '));
+    setDraggingIdx(null);
+    setDragOverIdx(null);
+  };
+
+  const handleImageDragEnd = () => {
+    setDraggingIdx(null);
+    setDragOverIdx(null);
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -38,6 +76,7 @@ function EditPanel({ service, onClose, onSave }) {
         approved: form.approved,
         featured: form.featured,
         notes: form.notes,
+        images: form.images,
       })
       .eq('id', form.id);
 
@@ -59,17 +98,13 @@ function EditPanel({ service, onClose, onSave }) {
     'w-full rounded-xl border border-stroke bg-white dark:bg-[#0A1628] text-text dark:text-white px-3 py-2 text-sm focus:outline-none focus:border-brand-blue';
   const labelClass = 'block text-xs font-bold text-text/60 dark:text-white/60 mb-1';
 
-  const imageUrls = form.images
-    ? form.images.split(',').map((u) => u.trim()).filter(Boolean)
-    : [];
-
   return (
     <div className="fixed inset-0 z-50 flex">
       <div className="flex-1 bg-black/40" onClick={onClose} />
       <div className="w-full max-w-lg bg-white dark:bg-[#0F2040] shadow-xl flex flex-col overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-stroke">
           <h2 className="font-bold text-dark-blue truncate pr-4">{service.title}</h2>
-          <button onClick={onClose} className="text-text/40 hover:text-text transition-colors text-xl leading-none">×</button>
+          <button onClick={onClose} className="text-text/40 hover:text-text transition-colors text-xl leading-none cursor-pointer">×</button>
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
@@ -178,13 +213,27 @@ function EditPanel({ service, onClose, onSave }) {
               <label className={labelClass}>Images</label>
               <div className="flex gap-2 flex-wrap">
                 {imageUrls.map((url, i) => (
-                  <img
+                  <div
                     key={i}
-                    src={url}
-                    alt=""
-                    className="w-20 h-20 object-cover rounded-lg"
-                    onError={(e) => { e.target.style.opacity = '0.3'; }}
-                  />
+                    draggable
+                    onDragStart={(e) => handleImageDragStart(e, i)}
+                    onDragOver={(e) => handleImageDragOver(e, i)}
+                    onDrop={(e) => handleImageDrop(e, i)}
+                    onDragEnd={handleImageDragEnd}
+                    className={`relative w-20 h-20 cursor-grab active:cursor-grabbing select-none transition-opacity ${draggingIdx === i ? 'opacity-40' : ''} ${dragOverIdx === i ? 'ring-2 ring-brand-blue rounded-lg' : ''}`}
+                  >
+                    <img
+                      src={url}
+                      alt=""
+                      className="w-full h-full object-cover rounded-lg"
+                      onError={(e) => { e.target.style.opacity = '0.3'; }}
+                    />
+                    {i === 0 && imageUrls.length > 1 && (
+                      <span className="absolute bottom-0 left-0 right-0 rounded-b-lg bg-black/60 text-white text-[10px] text-center py-0.5 leading-tight pointer-events-none">
+                        Cover
+                      </span>
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
@@ -197,13 +246,13 @@ function EditPanel({ service, onClose, onSave }) {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex-1 bg-brand-blue text-white font-semibold py-2.5 rounded-xl hover:opacity-90 disabled:opacity-50 transition-opacity text-sm"
+            className="flex-1 bg-brand-blue text-white font-semibold py-2.5 rounded-xl hover:opacity-90 disabled:opacity-50 transition-opacity text-sm cursor-pointer"
           >
             {saving ? 'Saving…' : 'Save'}
           </button>
           <button
             onClick={handleDelete}
-            className="px-4 py-2.5 rounded-xl text-sm text-brand-red hover:bg-brand-red/10 transition-colors"
+            className="px-4 py-2.5 rounded-xl text-sm text-brand-red hover:bg-brand-red/10 transition-colors cursor-pointer"
           >
             Delete
           </button>
