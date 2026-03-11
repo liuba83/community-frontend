@@ -65,7 +65,7 @@ export const categories = [
     ],
   },
   {
-    name: 'Auto & Transportation',
+    name: 'Auto & Travel',
     icon: '\uD83D\uDE97',
     subcategories: [
       'Car Repair / Mechanic',
@@ -73,6 +73,7 @@ export const categories = [
       'Driving Lessons',
       'Airport Transfers',
       'Vehicle Buying / Selling Assistance',
+      'Travel Agent',
     ],
   },
   {
