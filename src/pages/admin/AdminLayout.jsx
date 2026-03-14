@@ -49,6 +49,13 @@ export function AdminLayout() {
           </nav>
         </div>
         <div className="flex items-center gap-3">
+          <NavLink
+            to="/"
+            className="text-text/40 hover:text-brand-blue transition-colors text-sm"
+            title="Back to website"
+          >
+            ← Website
+          </NavLink>
           <a
             href="https://mail.zoho.com"
             target="_blank"
