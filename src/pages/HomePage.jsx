@@ -53,9 +53,11 @@ export function HomePage() {
 
   const isFiltering = searchQuery || selectedCategory;
 
-  // Up to 6 services shown in the featured section (featured ones first).
+  // Up to 6 services shown in the featured section (featured ones first, ordered by featured_order).
   const highlightedServices = useMemo(() => {
-    const featured = services.filter((s) => s.featured);
+    const featured = services
+      .filter((s) => s.featured)
+      .sort((a, b) => (a.featured_order ?? 999) - (b.featured_order ?? 999));
     const recentNonFeatured = services.filter((s) => !s.featured);
     return [...featured, ...recentNonFeatured].slice(0, 6);
   }, [services]);
