@@ -101,11 +101,13 @@ No rate limiting on any endpoint. Enables spam submissions, Cloudinary ID enumer
 
 ---
 
-### 6. Admin Session Check Race Condition
+### 6. ~~Admin Session Check Race Condition~~ — Fixed
 
 **File:** `src/pages/admin/AdminLayout.jsx`
 
 `loading` state is set *after* the async `getSession()` resolves, so admin content can briefly render before the redirect fires. Loading state should be `true` by default and only set to `false` after the session check completes.
+
+**Fix (2026-03-16):** Added an early `return` in the unauthenticated branch so `setLoading(false)` is never called when redirecting — the loading spinner stays visible until navigation completes and the component unmounts.
 
 **OWASP:** A01 – Broken Access Control
 
@@ -151,4 +153,4 @@ POST endpoints have no CSRF token validation. An attacker could trick a user's b
 | This week | Add IP-based rate limiting | `api/submit-service.js` | Partial |
 | ~~This week~~ | ~~Remove server secrets from Vite config~~ | `vite.config.js` | Fixed |
 | ~~Soon~~ | ~~Add CSP headers~~ | `vercel.json` | Fixed |
-| Soon | Fix AdminLayout loading state order | `src/pages/admin/AdminLayout.jsx` | Open |
+| ~~Soon~~ | ~~Fix AdminLayout loading state order~~ | `src/pages/admin/AdminLayout.jsx` | Fixed |
