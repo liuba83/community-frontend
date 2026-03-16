@@ -135,7 +135,7 @@ POST endpoints have no CSRF token validation. An attacker could trick a user's b
 
 | Priority | Issue | File(s) | Status |
 | -------- | ----- | ------- | ------ |
-| Now | Fix RLS — use admin role/claim, not just `authenticated` | `supabase/admin-rls.sql` | Open |
+| ~~Now~~ | ~~Fix RLS — use admin role/claim, not just `authenticated`~~ | `supabase/admin-rls.sql` | Fixed |
 | ~~Now~~ | ~~Add auth to `delete-image` + ownership check~~ | `api/delete-image.js` | Fixed |
 | ~~This week~~ | ~~Add input validation (email, phone, category allowlist, max lengths)~~ | `api/submit-service.js` | Fixed |
 | This week | Add IP-based rate limiting | `api/submit-service.js` | Partial |
