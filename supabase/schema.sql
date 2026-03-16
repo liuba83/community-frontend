@@ -15,6 +15,7 @@ create table services (
   images text,
   approved boolean default false,
   featured boolean default false,
+  featured_order integer default null,
   notes text,
   submitted_at timestamptz default now(),
   created_at timestamptz default now()
