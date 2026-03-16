@@ -14,7 +14,7 @@ import { SpinnerIcon } from "../UI/Icon";
 const MAX_IMAGES = 5;
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-async function uploadToCloudinary(file) {
+async function uploadToCloudinary(file, signal) {
     const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
     const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
     if (!cloudName || !uploadPreset)
@@ -27,6 +27,7 @@ async function uploadToCloudinary(file) {
         {
             method: "POST",
             body,
+            signal,
         },
     );
     if (!res.ok) throw new Error("Upload failed");
@@ -141,6 +142,8 @@ export function AddServiceForm() {
     const wasSubmittedRef = useRef(false);
     const removedIdsRef = useRef(new Set());
     const pageUnloadingRef = useRef(false);
+    const isUnmountingRef = useRef(false);
+    const uploadControllersRef = useRef({});
     const [isDragging, setIsDragging] = useState(false);
     const [imageError, setImageError] = useState("");
     const fileInputRef = useRef(null);
@@ -149,9 +152,15 @@ export function AddServiceForm() {
     const [dragOverId, setDragOverId] = useState(null);
 
     useEffect(() => {
+        isUnmountingRef.current = false;
+
         const handleBeforeUnload = () => {
             if (wasSubmittedRef.current) return;
             pageUnloadingRef.current = true;
+            isUnmountingRef.current = true;
+            Object.values(uploadControllersRef.current).forEach((c) =>
+                c.abort(),
+            );
             imagesRef.current
                 .filter((img) => img.cloudUrl)
                 .forEach((img) => {
@@ -173,6 +182,10 @@ export function AddServiceForm() {
         return () => {
             window.removeEventListener("beforeunload", handleBeforeUnload);
             if (wasSubmittedRef.current || pageUnloadingRef.current) return;
+            isUnmountingRef.current = true;
+            Object.values(uploadControllersRef.current).forEach((c) =>
+                c.abort(),
+            );
             imagesRef.current
                 .filter((img) => img.cloudUrl)
                 .forEach((img) => deleteFromCloudinary(img.cloudUrl));
@@ -192,13 +205,19 @@ export function AddServiceForm() {
                 }
                 const id = Math.random().toString(36).slice(2);
                 const previewUrl = URL.createObjectURL(file);
+                const controller = new AbortController();
+                uploadControllersRef.current[id] = controller;
                 setImages((prev) => [
                     ...prev,
                     { id, previewUrl, cloudUrl: null, status: "uploading" },
                 ]);
-                uploadToCloudinary(file)
+                uploadToCloudinary(file, controller.signal)
                     .then((cloudUrl) => {
-                        if (removedIdsRef.current.has(id)) {
+                        delete uploadControllersRef.current[id];
+                        if (
+                            removedIdsRef.current.has(id) ||
+                            isUnmountingRef.current
+                        ) {
                             deleteFromCloudinary(cloudUrl);
                         } else {
                             setImages((prev) =>
@@ -210,15 +229,17 @@ export function AddServiceForm() {
                             );
                         }
                     })
-                    .catch(() =>
+                    .catch((err) => {
+                        delete uploadControllersRef.current[id];
+                        if (err.name === "AbortError") return;
                         setImages((prev) =>
                             prev.map((img) =>
                                 img.id === id
                                     ? { ...img, status: "error" }
                                     : img,
                             ),
-                        ),
-                    );
+                        );
+                    });
             });
         if (hasOversized) setImageError(t("addService.errors.imageTooLarge"));
     };
