@@ -3,6 +3,7 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { fetchApprovedServices, getSupabaseAdmin } from './api/_lib/supabase.js'
+import { sendTelegramNotification } from './api/_lib/telegram.js'
 
 function localApiPlugin() {
   return {
@@ -50,6 +51,10 @@ function localApiPlugin() {
           const supabase = getSupabaseAdmin()
           const { error: sbError } = await supabase.from('services').insert(record)
           if (sbError) throw sbError
+
+          await sendTelegramNotification(record)
+            .then(() => console.log('Telegram notification sent'))
+            .catch((err) => console.error('Telegram notification failed:', err))
 
           res.statusCode = 200
           res.end(JSON.stringify({ success: true }))
@@ -143,6 +148,8 @@ export default defineConfig(({ mode }) => {
   process.env.CLOUDINARY_CLOUD_NAME ||= env.CLOUDINARY_CLOUD_NAME
   process.env.CLOUDINARY_API_KEY ||= env.CLOUDINARY_API_KEY
   process.env.CLOUDINARY_API_SECRET ||= env.CLOUDINARY_API_SECRET
+  process.env.TELEGRAM_BOT_TOKEN ||= env.TELEGRAM_BOT_TOKEN
+  process.env.TELEGRAM_CHAT_ID ||= env.TELEGRAM_CHAT_ID
 
   return {
     plugins: [react(), tailwindcss(), localApiPlugin()],
