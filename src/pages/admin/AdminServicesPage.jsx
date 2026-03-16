@@ -75,6 +75,7 @@ function EditPanel({ service, onClose, onSave }) {
         messenger: form.messenger,
         approved: form.approved,
         featured: form.featured,
+        featured_order: form.featured ? (form.featured_order ?? null) : null,
         notes: form.notes,
         images: form.images,
       })
@@ -128,6 +129,20 @@ function EditPanel({ service, onClose, onSave }) {
               />
               <span className="text-sm font-semibold text-dark-blue">Featured</span>
             </label>
+            {form.featured && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-text/50">Order</span>
+                <input
+                  type="number"
+                  min="1"
+                  max="99"
+                  placeholder="—"
+                  value={form.featured_order ?? ''}
+                  onChange={(e) => set('featured_order', e.target.value ? parseInt(e.target.value, 10) : null)}
+                  className="w-14 rounded-lg border border-stroke bg-white dark:bg-[#0A1628] text-text dark:text-white px-2 py-1 text-sm focus:outline-none focus:border-brand-blue"
+                />
+              </div>
+            )}
           </div>
 
           {/* Title */}
