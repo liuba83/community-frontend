@@ -97,7 +97,23 @@ AIRTABLE_TABLE_NAME=Services
 
 ## Development
 
-_Development workflow and commands will be documented as the project is built._
+```bash
+npm run dev       # start local dev server
+npm run build     # production build
+npm run lint      # lint
+npm test          # run all tests once
+npm run test:watch  # watch mode
+```
+
+## Testing
+
+Unit tests use [Vitest](https://vitest.dev/) (no extra config needed — it works natively with Vite).
+
+Test files live next to the source they cover:
+
+- `src/utils/validation.test.js` — phone/URL formatting utilities
+- `src/utils/imageUrl.test.js` — Cloudinary and Google Drive URL parsing
+- `api/submit-service.test.js` — submission handler (validation, rate limiting, honeypot)
 
 ## Deployment
 

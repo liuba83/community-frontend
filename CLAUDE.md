@@ -11,7 +11,23 @@ Spilno.us — Ukrainian professional services directory web app for the Texas co
 - No Redux/Zustand — React Context API only
 
 ## Package Manager
-**npm** (`npm run dev`, `npm run build`, `npm run lint`, `npm run preview`)
+**npm** (`npm run dev`, `npm run build`, `npm run lint`, `npm run preview`, `npm test`)
+
+## Testing
+
+- **Vitest** — test runner (works natively with Vite, no extra config needed)
+- `npm test` — run all tests once
+- `npm run test:watch` — watch mode
+
+Test files live next to the source files they cover (`*.test.js`):
+
+| File | What's covered |
+|------|---------------|
+| `src/utils/validation.test.js` | `formatPhone`, `isValidURL`, `getSafeHref`, `getDomain` |
+| `src/utils/imageUrl.test.js` | `convertGoogleDriveUrl`, `parseImageUrls` |
+| `api/submit-service.test.js` | All validation rules, honeypot, rate limiting, image filtering, success/error paths |
+
+Supabase and Telegram are mocked in `api/submit-service.test.js` via `vi.mock()`. No real DB or API calls are made during tests.
 
 ## Project Structure
 ```

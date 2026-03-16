@@ -5,10 +5,21 @@ import tailwindcss from '@tailwindcss/vite'
 import { fetchApprovedServices, getSupabaseAdmin } from './api/_lib/supabase.js'
 import { sendTelegramNotification } from './api/_lib/telegram.js'
 
-function localApiPlugin() {
+function localApiPlugin(env) {
   return {
     name: 'local-api-services',
     configureServer(server) {
+      // Expose server-only secrets to local API middleware.
+      // configureServer runs only during `vite dev`, never during `vite build`.
+      process.env.SUPABASE_URL ||= env.SUPABASE_URL
+      process.env.SUPABASE_SERVICE_KEY ||= env.SUPABASE_SERVICE_KEY
+      process.env.CLOUDINARY_CLOUD_NAME ||= env.CLOUDINARY_CLOUD_NAME
+      process.env.CLOUDINARY_API_KEY ||= env.CLOUDINARY_API_KEY
+      process.env.CLOUDINARY_API_SECRET ||= env.CLOUDINARY_API_SECRET
+      process.env.CLOUDINARY_UPLOAD_FOLDER ||= env.CLOUDINARY_UPLOAD_FOLDER
+      process.env.TELEGRAM_BOT_TOKEN ||= env.TELEGRAM_BOT_TOKEN
+      process.env.TELEGRAM_CHAT_ID ||= env.TELEGRAM_CHAT_ID
+
       server.middlewares.use('/api/submit-service', async (req, res) => {
         res.setHeader('Content-Type', 'application/json')
 
@@ -142,16 +153,7 @@ function localApiPlugin() {
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
 
-  // Make server-only variables available to local API middleware.
-  process.env.SUPABASE_URL ||= env.SUPABASE_URL
-  process.env.SUPABASE_SERVICE_KEY ||= env.SUPABASE_SERVICE_KEY
-  process.env.CLOUDINARY_CLOUD_NAME ||= env.CLOUDINARY_CLOUD_NAME
-  process.env.CLOUDINARY_API_KEY ||= env.CLOUDINARY_API_KEY
-  process.env.CLOUDINARY_API_SECRET ||= env.CLOUDINARY_API_SECRET
-  process.env.TELEGRAM_BOT_TOKEN ||= env.TELEGRAM_BOT_TOKEN
-  process.env.TELEGRAM_CHAT_ID ||= env.TELEGRAM_CHAT_ID
-
   return {
-    plugins: [react(), tailwindcss(), localApiPlugin()],
+    plugins: [react(), tailwindcss(), localApiPlugin(env)],
   }
 })

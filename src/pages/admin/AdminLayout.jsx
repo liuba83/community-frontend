@@ -8,7 +8,10 @@ export function AdminLayout() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) navigate('/admin/login', { replace: true });
+      if (!session) {
+        navigate('/admin/login', { replace: true });
+        return;
+      }
       setLoading(false);
     });
 
