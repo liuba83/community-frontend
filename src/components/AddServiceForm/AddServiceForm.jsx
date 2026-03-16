@@ -553,7 +553,7 @@ export function AddServiceForm() {
                                             <ComboboxOption
                                                 key={sub}
                                                 value={sub}
-                                                className="px-3 py-2 text-base text-text cursor-pointer data-[focus]:bg-light-gray data-[focus]:dark:bg-[#1E3A5F] data-[focus]:text-dark-blue"
+                                                className="px-3 py-2 text-base text-text cursor-pointer data-focus:bg-light-gray dark:data-focus:bg-[#1E3A5F] data-focus:text-dark-blue"
                                             >
                                                 {t(`subcategories.${sub}`)}
                                             </ComboboxOption>
@@ -593,7 +593,7 @@ export function AddServiceForm() {
                     )}
                     autoComplete="organization"
                 />
-                <p className={`text-xs text-right mt-1 ${formData.businessName.length >= 90 ? "text-brand-red" : "text-gray-400"}`}>
+                <p className={`text-xs text-right mt-1 ${formData.businessName.length >= 90 ? "text-brand-red" : "text-text/50"}`}>
                     {formData.businessName.length}/100
                 </p>
             </FormField>
@@ -623,7 +623,7 @@ export function AddServiceForm() {
                     onBlur={() => handleBlur("descriptionEn")}
                     className={`${inputClass(touched.descriptionEn && errors.descriptionEn)} resize-none`}
                 />
-                <p className={`text-xs text-right mt-1 ${formData.descriptionEn.length >= 550 ? "text-brand-red" : "text-gray-400"}`}>
+                <p className={`text-xs text-right mt-1 ${formData.descriptionEn.length >= 550 ? "text-brand-red" : "text-text/50"}`}>
                     {formData.descriptionEn.length}/600
                 </p>
             </FormField>
@@ -653,7 +653,7 @@ export function AddServiceForm() {
                     onBlur={() => handleBlur("descriptionUa")}
                     className={`${inputClass(touched.descriptionUa && errors.descriptionUa)} resize-none`}
                 />
-                <p className={`text-xs text-right mt-1 ${formData.descriptionUa.length >= 550 ? "text-brand-red" : "text-gray-400"}`}>
+                <p className={`text-xs text-right mt-1 ${formData.descriptionUa.length >= 550 ? "text-brand-red" : "text-text/50"}`}>
                     {formData.descriptionUa.length}/600
                 </p>
             </FormField>
