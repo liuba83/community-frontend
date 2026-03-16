@@ -111,11 +111,21 @@ No rate limiting on any endpoint. Enables spam submissions, Cloudinary ID enumer
 
 ---
 
-### 7. No CSP Headers
+### 7. ~~No CSP Headers~~ — Fixed
 
 **File:** `vercel.json`
 
 No `Content-Security-Policy` header defined. Reduces protection against XSS at the HTTP layer.
+
+**Fix (2026-03-16):** Added CSP and supporting headers in `vercel.json`:
+
+- `Content-Security-Policy` — restricts scripts, styles, fonts, images, and connections to known origins; blocks frames and objects; includes `upgrade-insecure-requests`
+- `X-Content-Type-Options: nosniff`
+- `X-Frame-Options: DENY`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- `Permissions-Policy` — disables camera, microphone, geolocation
+
+Note: `script-src` includes `'unsafe-inline'` to support the planned GA4 inline init script.
 
 **OWASP:** A05 – Security Misconfiguration
 
@@ -140,5 +150,5 @@ POST endpoints have no CSRF token validation. An attacker could trick a user's b
 | ~~This week~~ | ~~Add input validation (email, phone, category allowlist, max lengths)~~ | `api/submit-service.js` | Fixed |
 | This week | Add IP-based rate limiting | `api/submit-service.js` | Partial |
 | ~~This week~~ | ~~Remove server secrets from Vite config~~ | `vite.config.js` | Fixed |
-| Soon | Add CSP headers | `vercel.json` | Open |
+| ~~Soon~~ | ~~Add CSP headers~~ | `vercel.json` | Fixed |
 | Soon | Fix AdminLayout loading state order | `src/pages/admin/AdminLayout.jsx` | Open |
