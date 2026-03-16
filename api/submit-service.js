@@ -1,5 +1,8 @@
 import { getSupabaseAdmin } from './_lib/supabase.js';
 import { sendTelegramNotification } from './_lib/telegram.js';
+import { getAllSubcategories } from '../src/data/categories.js';
+
+const VALID_CATEGORIES = new Set(getAllSubcategories());
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -27,10 +30,47 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true });
   }
 
-  // Required field validation
+  // Required fields
   if (!category || !businessName?.trim() || !descriptionEn?.trim() || !descriptionUa?.trim() || !phone?.trim() || !email?.trim()) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
+
+  // Category allowlist
+  if (!VALID_CATEGORIES.has(category)) {
+    return res.status(400).json({ error: 'Invalid category' });
+  }
+
+  // Format validation
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    return res.status(400).json({ error: 'Invalid email' });
+  }
+  if (!/^[\d\s+\-()]+$/.test(phone.trim())) {
+    return res.status(400).json({ error: 'Invalid phone' });
+  }
+  if (website?.trim() && !/^https?:\/\//i.test(website.trim())) {
+    return res.status(400).json({ error: 'Invalid website URL' });
+  }
+  if (instagram?.trim() && !/instagram\.com\//i.test(instagram.trim())) {
+    return res.status(400).json({ error: 'Invalid Instagram URL' });
+  }
+  if (facebook?.trim() && !/facebook\.com\//i.test(facebook.trim())) {
+    return res.status(400).json({ error: 'Invalid Facebook URL' });
+  }
+  if (linkedin?.trim() && !/linkedin\.com\//i.test(linkedin.trim())) {
+    return res.status(400).json({ error: 'Invalid LinkedIn URL' });
+  }
+
+  // Length limits
+  if (businessName.trim().length > 100) return res.status(400).json({ error: 'Business name too long' });
+  if (descriptionEn.trim().length > 600) return res.status(400).json({ error: 'Description too long' });
+  if (descriptionUa.trim().length > 600) return res.status(400).json({ error: 'Description too long' });
+  if (phone.trim().length > 30) return res.status(400).json({ error: 'Phone too long' });
+  if (email.trim().length > 200) return res.status(400).json({ error: 'Email too long' });
+  if (address?.trim().length > 200) return res.status(400).json({ error: 'Address too long' });
+  if (website?.trim().length > 300) return res.status(400).json({ error: 'Website URL too long' });
+  if (instagram?.trim().length > 300) return res.status(400).json({ error: 'Instagram URL too long' });
+  if (facebook?.trim().length > 300) return res.status(400).json({ error: 'Facebook URL too long' });
+  if (linkedin?.trim().length > 300) return res.status(400).json({ error: 'LinkedIn URL too long' });
 
   const record = {
     title: businessName.trim(),
@@ -57,6 +97,19 @@ export default async function handler(req, res) {
 
   try {
     const supabase = getSupabaseAdmin();
+
+    // Rate limit: max 3 submissions per email in 24 hours
+    const normalizedEmail = email.trim().toLowerCase();
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { count, error: countError } = await supabase
+      .from('services')
+      .select('*', { count: 'exact', head: true })
+      .ilike('email', normalizedEmail)
+      .gte('submitted_at', cutoff);
+    if (!countError && count >= 3) {
+      return res.status(429).json({ error: 'Too many submissions. Please try again later.' });
+    }
+
     const { error } = await supabase.from('services').insert(record);
     if (error) throw error;
 
