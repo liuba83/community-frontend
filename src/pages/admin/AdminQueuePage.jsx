@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
+import { getCloudinaryPublicId } from '../../utils/imageUrl';
 
 export function AdminQueuePage() {
   const [items, setItems] = useState([]);
@@ -25,6 +26,21 @@ export function AdminQueuePage() {
 
   const remove = async (id, title) => {
     if (!window.confirm(`Delete "${title}"?`)) return;
+    const item = items.find((i) => i.id === id);
+    if (item?.images) {
+      const urls = item.images.split(',').map((u) => u.trim()).filter((u) => u.startsWith('https://res.cloudinary.com/'));
+      await Promise.allSettled(
+        urls.map((url) => {
+          const publicId = getCloudinaryPublicId(url);
+          if (!publicId) return Promise.resolve();
+          return fetch('/api/delete-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ publicId }),
+          });
+        })
+      );
+    }
     const { error } = await supabase.from('services').delete().eq('id', id);
     if (!error) setItems((prev) => prev.filter((i) => i.id !== id));
   };
@@ -90,13 +106,13 @@ export function AdminQueuePage() {
               <div className="flex gap-2 shrink-0">
                 <button
                   onClick={() => approve(item.id)}
-                  className="bg-brand-blue text-white text-sm font-semibold px-4 py-2 rounded-xl hover:opacity-90 transition-opacity"
+                  className="bg-brand-blue text-white text-sm font-semibold px-4 py-2 rounded-xl hover:opacity-90 transition-opacity cursor-pointer"
                 >
                   Approve
                 </button>
                 <button
                   onClick={() => remove(item.id, item.title)}
-                  className="bg-gray dark:bg-white/10 text-text/60 dark:text-white/60 text-sm px-4 py-2 rounded-xl hover:bg-brand-red/10 hover:text-brand-red transition-colors"
+                  className="bg-gray dark:bg-white/10 text-text/60 dark:text-white/60 text-sm px-4 py-2 rounded-xl hover:bg-brand-red/10 hover:text-brand-red transition-colors cursor-pointer"
                 >
                   Delete
                 </button>

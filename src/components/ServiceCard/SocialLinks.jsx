@@ -21,7 +21,7 @@ export function SocialLinks({ service }) {
           href={getSafeHref(service[item.key])}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-dark-blue/40 dark:text-white/50 hover:text-brand-blue dark:hover:text-[#60A5FA] transition-colors"
+          className="text-dark-blue/70 dark:text-white/80 hover:text-brand-blue dark:hover:text-[#60A5FA] transition-colors"
           aria-label={item.label}
         >
           <item.Icon className="w-6 h-6" />

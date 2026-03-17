@@ -1,3 +1,8 @@
+export function getCloudinaryPublicId(url) {
+  const match = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[^/.]+$/);
+  return match ? match[1] : null;
+}
+
 function getCloudinaryUrl(url) {
   return url.replace('/upload/', '/upload/f_auto,q_auto,w_1200/');
 }
