@@ -11,15 +11,9 @@ export default async function handler(req, res) {
   const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
   const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
   const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
-  const CLOUDINARY_UPLOAD_FOLDER = process.env.CLOUDINARY_UPLOAD_FOLDER;
 
-  if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET || !CLOUDINARY_UPLOAD_FOLDER) {
+  if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
     return res.status(500).json({ error: 'Server configuration error' });
-  }
-
-  // Only allow deletion of images within this app's designated upload folder
-  if (!publicId.startsWith(CLOUDINARY_UPLOAD_FOLDER + '/')) {
-    return res.status(403).json({ error: 'Forbidden' });
   }
 
   const credentials = Buffer.from(`${CLOUDINARY_API_KEY}:${CLOUDINARY_API_SECRET}`).toString('base64');
