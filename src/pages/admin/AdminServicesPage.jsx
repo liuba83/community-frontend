@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { categories } from '../../data/categories';
+import { getCloudinaryPublicId } from '../../utils/imageUrl';
 
 const allSubcategories = categories.flatMap((c) => c.subcategories);
 
@@ -91,6 +92,20 @@ function EditPanel({ service, onClose, onSave }) {
 
   const handleDelete = async () => {
     if (!window.confirm(`Delete "${form.title}"?`)) return;
+    if (form.images) {
+      const urls = form.images.split(',').map((u) => u.trim()).filter((u) => u.startsWith('https://res.cloudinary.com/'));
+      await Promise.allSettled(
+        urls.map((url) => {
+          const publicId = getCloudinaryPublicId(url);
+          if (!publicId) return Promise.resolve();
+          return fetch('/api/delete-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ publicId }),
+          });
+        })
+      );
+    }
     const { error } = await supabase.from('services').delete().eq('id', form.id);
     if (!error) onSave(null);
   };

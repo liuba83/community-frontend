@@ -16,7 +16,6 @@ function localApiPlugin(env) {
       process.env.CLOUDINARY_CLOUD_NAME ||= env.CLOUDINARY_CLOUD_NAME
       process.env.CLOUDINARY_API_KEY ||= env.CLOUDINARY_API_KEY
       process.env.CLOUDINARY_API_SECRET ||= env.CLOUDINARY_API_SECRET
-      process.env.CLOUDINARY_UPLOAD_FOLDER ||= env.CLOUDINARY_UPLOAD_FOLDER
       process.env.TELEGRAM_BOT_TOKEN ||= env.TELEGRAM_BOT_TOKEN
       process.env.TELEGRAM_CHAT_ID ||= env.TELEGRAM_CHAT_ID
 
