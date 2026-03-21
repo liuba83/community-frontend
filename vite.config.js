@@ -59,10 +59,14 @@ function localApiPlugin(env) {
           if (validImageUrls.length > 0) record.images = validImageUrls.join(',')
 
           const supabase = getSupabaseAdmin()
-          const { error: sbError } = await supabase.from('services').insert(record)
+          const { data: inserted, error: sbError } = await supabase
+            .from('services')
+            .insert(record)
+            .select('id')
+            .single()
           if (sbError) throw sbError
 
-          await sendTelegramNotification(record)
+          await sendTelegramNotification(record, inserted?.id)
             .then(() => console.log('Telegram notification sent'))
             .catch((err) => console.error('Telegram notification failed:', err))
 
