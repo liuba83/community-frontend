@@ -90,4 +90,12 @@ describe('deleteCloudinaryImageById', () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, text: async () => 'Not Found' }));
     await expect(deleteCloudinaryImageById('missing/img')).rejects.toThrow();
   });
+
+  it('throws immediately when Cloudinary credentials are missing', async () => {
+    delete process.env.CLOUDINARY_CLOUD_NAME;
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+    await expect(deleteCloudinaryImageById('some/img')).rejects.toThrow('Cloudinary credentials not configured');
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
 });

@@ -7,6 +7,7 @@ export async function deleteCloudinaryImageById(publicId) {
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
   const apiKey = process.env.CLOUDINARY_API_KEY;
   const apiSecret = process.env.CLOUDINARY_API_SECRET;
+  if (!cloudName || !apiKey || !apiSecret) throw new Error('Cloudinary credentials not configured');
   const credentials = Buffer.from(`${apiKey}:${apiSecret}`).toString('base64');
   const response = await fetch(
     `https://api.cloudinary.com/v1_1/${cloudName}/resources/image/upload?public_ids[]=${encodeURIComponent(publicId)}`,
