@@ -41,6 +41,12 @@ describe('buildMessageText', () => {
     expect(text).not.toContain('<script>');
   });
 
+  it('HTML-escapes & in user fields', () => {
+    const text = buildMessageText({ ...base, title: 'Bread & Butter Co' });
+    expect(text).toContain('Bread &amp; Butter Co');
+    expect(text).not.toContain('Bread & Butter Co');
+  });
+
   it('produces identical output from record shape and Supabase row shape (same field names)', () => {
     // Supabase column names match the record fields used in the message
     const record = { title: 'Biz', category: 'Cat', phone: '123', email: 'a@b.com' };
@@ -57,6 +63,14 @@ describe('sendTelegramNotification', () => {
 
   it('does nothing when env vars are missing', async () => {
     delete process.env.TELEGRAM_BOT_TOKEN;
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+    await sendTelegramNotification({ title: 'T', category: 'C', phone: '1', email: 'e@e.com' });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('does nothing when TELEGRAM_CHAT_ID is missing', async () => {
+    delete process.env.TELEGRAM_CHAT_ID;
     const fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
     await sendTelegramNotification({ title: 'T', category: 'C', phone: '1', email: 'e@e.com' });
