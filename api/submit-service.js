@@ -110,10 +110,14 @@ export default async function handler(req, res) {
       return res.status(429).json({ error: 'Too many submissions. Please try again later.' });
     }
 
-    const { error } = await supabase.from('services').insert(record);
+    const { data: inserted, error } = await supabase
+      .from('services')
+      .insert(record)
+      .select('id')
+      .single();
     if (error) throw error;
 
-    await sendTelegramNotification(record)
+    await sendTelegramNotification(record, inserted?.id)
       .then(() => console.log('Telegram notification sent'))
       .catch((err) => console.error('Telegram notification failed:', err));
 

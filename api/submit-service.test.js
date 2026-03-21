@@ -8,6 +8,7 @@ vi.mock('../src/data/categories.js', () => ({
 
 import handler from './submit-service.js';
 import { getSupabaseAdmin } from './_lib/supabase.js';
+import { sendTelegramNotification } from './_lib/telegram.js';
 
 // --- helpers ---
 
@@ -38,7 +39,14 @@ function mockSupabase({ count = 0, countError = null, insertError = null } = {})
     select: vi.fn().mockReturnThis(),
     ilike: vi.fn().mockReturnThis(),
     gte: vi.fn().mockResolvedValue({ count, error: countError }),
-    insert: vi.fn().mockResolvedValue({ error: insertError }),
+    insert: vi.fn().mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        single: vi.fn().mockResolvedValue({
+          data: insertError ? null : { id: 'test-uuid-123' },
+          error: insertError ?? null,
+        }),
+      }),
+    }),
   };
   getSupabaseAdmin.mockReturnValue({ from: vi.fn().mockReturnValue(chain) });
   return chain;
@@ -283,5 +291,15 @@ describe('success and error paths', () => {
 
     const inserted = chain.insert.mock.calls[0][0];
     expect(inserted.approved).toBe(false);
+  });
+
+  it('passes the inserted row id to sendTelegramNotification', async () => {
+    mockSupabase();
+    const res = makeRes();
+    await handler(makeReq(), res);
+    expect(sendTelegramNotification).toHaveBeenCalledWith(
+      expect.objectContaining({ title: 'Test Business' }),
+      'test-uuid-123'
+    );
   });
 });
