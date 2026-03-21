@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { fetchApprovedServices, getSupabaseAdmin } from './api/_lib/supabase.js'
 import { sendTelegramNotification } from './api/_lib/telegram.js'
+import { deleteCloudinaryImageById } from './api/_lib/cloudinary.js'
 
 function localApiPlugin(env) {
   return {
@@ -97,23 +98,7 @@ function localApiPlugin(env) {
             res.statusCode = 400; res.end(JSON.stringify({ error: 'Missing publicId' })); return
           }
 
-          const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env
-
-          if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
-            res.statusCode = 500; res.end(JSON.stringify({ error: 'Server configuration error' })); return
-          }
-
-          const credentials = Buffer.from(`${CLOUDINARY_API_KEY}:${CLOUDINARY_API_SECRET}`).toString('base64')
-          const cloudRes = await fetch(
-            `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/resources/image/upload?public_ids[]=${encodeURIComponent(publicId)}`,
-            { method: 'DELETE', headers: { Authorization: `Basic ${credentials}` } },
-          )
-
-          if (!cloudRes.ok) {
-            console.error('Cloudinary delete error:', await cloudRes.text())
-            res.statusCode = 500; res.end(JSON.stringify({ error: 'Failed to delete image' })); return
-          }
-
+          await deleteCloudinaryImageById(publicId)
           res.statusCode = 200
           res.end(JSON.stringify({ success: true }))
         } catch (error) {
