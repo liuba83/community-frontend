@@ -35,6 +35,7 @@ Change `.insert(record)` to `.insert(record).select('id').single()` to retrieve 
   - `[❌ Delete]` → callback_data: `delete_<uuid>`
 - Extract message text construction into a named helper `buildMessageText(row)` — used both when sending and when reconstructing for edits in the webhook
 - `buildMessageText` accepts an object with fields `title`, `category`, `phone`, `email`, `address`, `website` — these match both the `record` shape passed at submission time and the Supabase column names returned by a `select('*')` query, so the same function works in both contexts
+- All user-supplied string fields are HTML-escaped before interpolation (replace `&`, `<`, `>`, `"` with their HTML entities) to prevent malformed submissions from breaking `parse_mode: 'HTML'` and causing `sendMessage`/`editMessageText` to fail
 
 **`api/_lib/telegram.js`** also exports `buildMessageText` so the webhook can reconstruct the original HTML body.
 
@@ -69,14 +70,15 @@ Handler steps:
    - Validate `serviceId` against UUID regex (`/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i`) — if invalid, call `editMessageText` with `⚠️ Invalid request` and return 200
    - If `action` is not `approve` or `delete`, call `editMessageText` with `⚠️ Unknown action` and return 200
 5. Fetch the service row from Supabase: `select('*').eq('id', serviceId).single()`
-   - If not found (row doesn't exist or already deleted): call `editMessageText` with `⚠️ Not found` and return 200
+   - If Supabase returns error code `PGRST116` (no rows): call `editMessageText` with `⚠️ Not found` and return 200
+   - If Supabase returns any other error: call `editMessageText` with `⚠️ Error: <message>` and return 200
 6. **Approve path:**
    - If `row.approved === true`: call `editMessageText` with `ℹ️ Already approved` and return 200
    - Otherwise: `supabase.update({ approved: true }).eq('id', serviceId)`
    - On success: call `editMessageText` with `✅ Approved`
    - On Supabase error: call `editMessageText` with `⚠️ Error: <message>` and return 200
 7. **Delete path:**
-   - Call `deleteCloudinaryImages(row.images)` — non-blocking on individual failures
+   - `await deleteCloudinaryImages(row.images)` — awaited so it completes before the function returns (prevents Vercel from freezing the context mid-flight); individual failures are logged and do not abort the remaining images or the DB delete
    - `supabase.delete().eq('id', serviceId)`
    - On success: call `editMessageText` with `🗑 Deleted`
    - On Supabase error: call `editMessageText` with `⚠️ Error: <message>` and return 200
@@ -113,6 +115,7 @@ Admin taps button in Telegram
 - All Supabase operations use the service role key (server-side only)
 - `chat_id` from `callback_query.message.chat.id` is used for message edits rather than env var, ensuring edits target the correct chat
 - All non-401 paths return 200 to prevent Telegram retry loops
+- **Accepted risk:** The webhook secret validates that the request originates from Telegram's infrastructure but does not restrict which Telegram user pressed the button. Any user who can interact with the bot (e.g., in the same group chat) and knows the callback format could trigger approve/delete. For a private admin bot where the chat is not publicly accessible, this is an acceptable trade-off. If the bot is ever added to a public group, a Telegram user ID allowlist should be added.
 
 ## Environment Variables
 
